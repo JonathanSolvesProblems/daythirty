@@ -1,0 +1,30 @@
+# Corpus and derived splits are large and are public data. They are fetched by
+# scripts/fetch_corpus.py rather than committed, so a clean clone reproduces them.
+data/raw/
+data/split/
+data/index/
+
+# Secrets. Nothing in this repo may carry a credential: it ships public under an
+# OSI license as a submission requirement.
+.env
+.env.*
+*.pem
+config.local.json
+credentials.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# Node
+node_modules/
+.next/
+dist/
+
+# Local scratch
+scratch/
+*.log
