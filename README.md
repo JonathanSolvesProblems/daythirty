@@ -1,8 +1,12 @@
-# Overturn
+# Day Thirty
 
 An agent that works a California health insurance denial end to end: it tracks the
 statutory clock, finds how people actually won cases like yours, drafts the appeal, and
 stops for your approval before anything is filed.
+
+The name is the mechanism. On the thirtieth day after you file a grievance, a six month
+clock starts whether or not your plan has answered you, and almost nobody knows it
+started.
 
 Built with the Strands Agents SDK for the AWS Agents for Humans Hackathon.
 
@@ -35,7 +39,7 @@ Counting six months from the plan's eventual answer therefore puts the deadline 
 `(response time − 30)` days too late. If the plan takes four months to say no, someone
 counting from the no is already about three months past their real deadline.
 
-`src/overturn/deadlines.py` computes this from the statute. Every rule cites its
+`src/daythirty/deadlines.py` computes this from the statute. Every rule cites its
 provision:
 
 | Provision | Rule |

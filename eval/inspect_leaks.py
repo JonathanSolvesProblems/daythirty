@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from overturn.precedent import reasoning_of  # noqa: E402
+from daythirty.precedent import reasoning_of  # noqa: E402
 
 TRAIN = ROOT / "data" / "split" / "train.jsonl"
 

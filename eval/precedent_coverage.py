@@ -16,7 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from overturn.precedent import PrecedentIndex  # noqa: E402
+from daythirty.precedent import PrecedentIndex  # noqa: E402
 
 TEST = ROOT / "data" / "split" / "test.jsonl"
 

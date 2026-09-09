@@ -21,7 +21,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from overturn.deadlines import (  # noqa: E402
+from daythirty.deadlines import (  # noqa: E402
     add_calendar_months,
     imr_filing_deadline,
     roll_off_holiday,

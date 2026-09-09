@@ -1,13 +1,15 @@
-# Overturn — demo script
+# Day Thirty, demo script
 
 Written before the first commit, per the focus rule. Narration is locked first; footage
 is cut to the narration, never the other way round.
 
 **Target: 80 seconds.** Hard ceiling 5:00 by the rules, but the archive says 60 to 90.
 
-**Name:** Overturn. It is the word California's own reviewers use in the determination
-field (`Overturned Decision of Health Plan`). The name promises an outcome, and the demo
-pays it with the state's published rate rather than with a claim of my own.
+**Name:** Day Thirty. It names the mechanism the whole project rests on, from
+`HSC § 1374.30(j)(3)`: on the thirtieth day after the grievance is filed, the clock starts
+whether or not the plan has answered. The name creates a question and the demo answers it
+at 0:09, which is the point. It also promises nothing the product cannot deliver, unlike
+naming it after an outcome.
 
 ---
 
@@ -28,7 +30,7 @@ started. If your plan takes four months to say no, and you count six months from
 you are already three months past the deadline and you never had a chance.
 
 **[0:24]**
-Overturn runs in the background and does the whole thing.
+Day Thirty runs in the background and does the whole thing.
 
 *(on screen: agent picks up the denial on its own)*
 
@@ -42,7 +44,7 @@ Then it looks up how people actually won.
 *(on screen: precedent retrieval)*
 
 California publishes every independent medical review decision it has ever made. Forty-two
-thousand of them. Overturn pulls the ones closest to this case and reads what the
+thousand of them. Day Thirty pulls the ones closest to this case and reads what the
 reviewing physician actually found persuasive.
 
 **[0:52]**
@@ -70,7 +72,7 @@ percent.
 **[1:22]**
 The entire gap is people not filing.
 
-Overturn files.
+Day Thirty files.
 
 ---
 

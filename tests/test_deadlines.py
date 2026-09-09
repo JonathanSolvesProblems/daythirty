@@ -8,7 +8,7 @@ from datetime import date
 
 import pytest
 
-from overturn.deadlines import (
+from daythirty.deadlines import (
     add_calendar_months,
     imr_filing_deadline,
     is_holiday,
