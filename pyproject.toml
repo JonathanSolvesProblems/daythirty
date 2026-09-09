@@ -1,0 +1,21 @@
+[project]
+name = "daythirty"
+version = "0.1.0"
+description = "An agent that works a California health insurance denial end to end"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# Without this, `pytest` from a clean clone fails to import the package and reports a
+# collection error, which looks like a broken project. Found by actually cloning the
+# repo into a temp directory and running it, rather than by trusting the shell I had
+# already configured.
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

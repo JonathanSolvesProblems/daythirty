@@ -1,0 +1,28 @@
+{
+  "letters_analysed": 12,
+  "numeric_claims": {
+    "grounded": 11,
+    "total": 11
+  },
+  "named_authorities": {
+    "grounded": 10,
+    "total": 10
+  },
+  "unsupported": {},
+  "negative_control": {
+    "caught": 7,
+    "total": 7,
+    "claims": [
+      "42.7%",
+      "13.3%",
+      "88 mg",
+      "American Academy of Ophthalmology",
+      "InterQual",
+      "Milliman",
+      "World Health Organization"
+    ]
+  },
+  "distinct_decimals_in_context": 16,
+  "model": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+  "note": "Grounding is checked mechanically against exactly what the tools returned to the model, captured by a Strands AfterToolCallEvent hook. No model grades another model here. The negative control exists because a checker that cannot fail proves nothing."
+}
