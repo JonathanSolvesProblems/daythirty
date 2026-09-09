@@ -22,6 +22,7 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "src"))
 
 from daythirty.agent import build_agent  # noqa: E402
+from daythirty.intake import parse_denial_letter, render_denial_letter  # noqa: E402
 from daythirty.precedent import PrecedentIndex  # noqa: E402
 
 TEST = ROOT / "data" / "split" / "test.jsonl"
@@ -47,31 +48,44 @@ def main() -> int:
     denial = date.today() - timedelta(days=95)
     grievance = denial + timedelta(days=9)
 
+    letter = render_denial_letter(c, denial.isoformat())
+
     print(RULE)
-    print("A REAL DENIAL FROM CALIFORNIA'S PUBLISHED RECORD")
+    print("THE DENIAL LETTER")
     print(RULE)
-    print(f"  diagnosis : {c['DiagnosisCategory']} / {c['DiagnosisSubCategory']}")
-    print(f"  treatment : {c['TreatmentCategory']} / {c['TreatmentSubCategory']}")
-    print(f"  grounds   : {c['Type']}")
-    print(f"  patient   : {c['AgeRange']}, {c['PatientGender']}")
-    print(f"  denial dated {denial}, grievance filed {grievance}, plan has not answered")
-    print(f"\n  what the state actually determined: "
+    print(letter)
+
+    print(RULE)
+    print("AMAZON NOVA READS IT")
+    print(RULE)
+    intake = parse_denial_letter(letter)
+    print(f"  condition read from the letter : {intake.condition_text}")
+    print(f"  treatment read from the letter : {intake.treatment_text}")
+    print(f"  grounds                        : {intake.grounds}")
+    print(f"  denial date                    : {intake.denial_date}")
+    print(f"  -> California's category       : {intake.diagnosis_category} / "
+          f"{intake.treatment_category}")
+    for corr in intake.corrections:
+        print(f"  correction: {corr}")
+    print(f"\n  the state's own filing for this case: "
+          f"{c['DiagnosisCategory']} / {c['TreatmentCategory']}")
+    print(f"  the state's determination: "
           f"{'OVERTURNED' if rec['label'] else 'UPHELD'}   (the agent cannot see this)")
     print()
 
     agent = build_agent()
     prompt = f"""My health plan denied coverage and I want to appeal to the state.
 
-Denial letter date: {denial.isoformat()}
+Denial letter date: {intake.denial_date or denial.isoformat()}
 I filed a grievance with my plan on: {grievance.isoformat()}
 My plan has not answered the grievance.
 
-What was denied:
-- Diagnosis category: {c['DiagnosisCategory']}
-- Diagnosis: {c['DiagnosisSubCategory']}
-- Treatment category: {c['TreatmentCategory']}
-- Treatment refused: {c['TreatmentSubCategory']}
-- The plan's stated grounds: {c['Type']}
+What was denied, read from my denial letter:
+- Diagnosis category: {intake.diagnosis_category}
+- Diagnosis: {intake.diagnosis_subcategory or intake.condition_text}
+- Treatment category: {intake.treatment_category}
+- Treatment refused: {intake.treatment_subcategory or intake.treatment_text}
+- The plan's stated grounds: {intake.grounds}
 - Me: {c['AgeRange']}, {c['PatientGender']}
 
 Work out my deadline, find out how cases like mine were actually decided, and draft

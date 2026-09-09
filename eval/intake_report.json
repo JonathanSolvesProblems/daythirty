@@ -1,0 +1,26 @@
+{
+  "letters": 30,
+  "errors": 0,
+  "model": "us.amazon.nova-lite-v1:0",
+  "diagnosis_category_exact": [
+    20,
+    30
+  ],
+  "diagnosis_category_equivalent": [
+    26,
+    30
+  ],
+  "treatment_category_exact": [
+    25,
+    30
+  ],
+  "grounds_exact": [
+    30,
+    30
+  ],
+  "denial_date_exact": [
+    30,
+    30
+  ],
+  "note": "Ground truth is the category California assigned to each published case. The rendered letter contains only the specific condition and treatment, never a category name, so recovering the category is inference against a label the state authored and I cannot influence."
+}

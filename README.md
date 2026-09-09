@@ -119,6 +119,40 @@ a hepatitis antiviral denial, because at the coarsest tier every pharmacy case m
 equally. The remaining **15.9%** get an honest "no close enough published decision"
 instead of a misleading one.
 
+## Reading the letter
+
+Real people do not have database fields. They have a letter from their plan. Amazon Nova
+reads it (`src/daythirty/intake.py`) and pulls out the condition, the treatment, the
+grounds and the dates.
+
+The taxonomy mapping is **not** done by the model, and that was a correction. Asking Nova
+for California's category directly scored 30% exact, and reading the misses showed why:
+the state files `Speech Therapy` under `Autism Related Tx` and `Arthritis` under
+`Immuno Disorders`, classifying by patient context and disease mechanism. A letter does
+not contain that. It is not inference, it is a lookup, and the corpus already answered it
+42,749 times. So the model reads, and the subcategory-to-category mapping comes from the
+state's own filings (`scripts/build_taxonomy.py`).
+
+Moving that boundary took diagnosis category from 30.0% to **66.7%** and treatment
+category from 33.3% to **83.3%**.
+
+Scored on 30 held-out cases, against the label California itself assigned
+(`eval/intake_accuracy.py`, report in `eval/intake_report.json`):
+
+| | |
+|---|---|
+| Denial grounds | **30/30 (100%)** |
+| Denial date read off the letter | **30/30 (100%)** |
+| Treatment category, exact | **25/30 (83.3%)** |
+| Diagnosis category, exact | **20/30 (66.7%)** |
+| Diagnosis category, allowing DMHC's own synonyms | **26/30 (86.7%)** |
+
+The remaining errors are largely California disagreeing with itself. 4.9% of diagnosis
+subcategories and 7.0% of treatment subcategories have been filed under more than one
+category over the years, and three of the misses are cases where the state's own
+treatment subcategory is the literal string `"Other"`. The synonym groups used for the
+second row are listed in the eval script rather than hidden.
+
 ## The agent
 
 Three tools and a gate (`src/daythirty/agent.py`):
@@ -187,7 +221,16 @@ Requires AWS credentials with Bedrock access in `us-east-1`.
   differently written decisions than the held-out cases.
 - **`find_precedent` is taxonomy-matched, not semantic.** That is why 15.9% of denials get
   no exemplar. Embedding retrieval would reach cases the state's categories separate but
-  medicine does not.
+  medicine does not. This was attempted with `amazon.nova-2-multimodal-embeddings-v1:0`
+  (`scripts/build_embeddings.py`, which works and is kept) and abandoned on cost: at 16
+  concurrent workers this account lost 46% of calls to throttling, and the sustainable
+  rate put the 12,570-record exemplar pool at several hours. The script is left in place
+  because the approach is right; the index is not built.
+- **The denial letter is rendered, not captured.** DMHC publishes determinations, not the
+  plan correspondence behind them, so no real letter exists to download for a published
+  case. The clinical facts in every letter are the state's; the letterhead is not. Note
+  this also makes the intake score conservative in one direction and generous in another:
+  the letter uses DMHC's own clinical descriptors rather than a real plan's wording.
 
 ## Status
 
