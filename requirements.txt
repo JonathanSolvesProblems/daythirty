@@ -1,0 +1,12 @@
+# Day Thirty
+# Pinned so a clean clone reproduces the judged run.
+
+strands-agents==1.55.0
+strands-agents-tools==0.8.8
+boto3>=1.35
+
+# Deployment target. AgentCore is optional per the hackathon rules but strengthens
+# the technical implementation score, and the agent is written to run either way.
+bedrock-agentcore==1.22.0
+
+pytest>=8.0
