@@ -30,6 +30,12 @@ OUT = ROOT / "data" / "split"
 
 TEST_FROM_YEAR = 2025
 
+# DMHC only began publishing the structured "Findings / Final Result / Credentials"
+# narrative in 2015, and only reached ~98% coverage in 2016 (eval/structure_by_year.py).
+# Cases before that are 500 to 1,300 characters of unstructured prose and cannot be used
+# as precedent, so the index starts at 2016 rather than silently including them.
+TRAIN_FROM_YEAR = 2016
+
 # Exactly the fields a patient can read off their own denial letter.
 CASE_FIELDS = [
     "DiagnosisCategory",
@@ -71,11 +77,12 @@ def main() -> None:
             }
             if year >= TEST_FROM_YEAR:
                 test.append(rec)
-            else:
+            elif year >= TRAIN_FROM_YEAR:
                 # Findings kept ONLY on the train side; this is the precedent the
                 # agent is allowed to read and cite.
                 rec["findings"] = row.get("Findings") or ""
                 train.append(rec)
+            # Pre-2016 cases are dropped entirely: no usable narrative to cite.
 
     OUT.mkdir(parents=True, exist_ok=True)
     with (OUT / "train.jsonl").open("w", encoding="utf-8") as fh:
@@ -85,8 +92,8 @@ def main() -> None:
         for r in test:
             fh.write(json.dumps(r) + "\n")
 
-    print(f"train (<= {TEST_FROM_YEAR - 1}): {len(train):,}")
-    print(f"test  (>= {TEST_FROM_YEAR}):    {len(test):,}")
+    print(f"train ({TRAIN_FROM_YEAR}-{TEST_FROM_YEAR - 1}): {len(train):,}")
+    print(f"test  (>= {TEST_FROM_YEAR}):      {len(test):,}")
     base = sum(r["label"] for r in test) / len(test)
     print(f"test overturn base rate:  {base:.4f}")
     print(f"majority-class accuracy:  {max(base, 1 - base):.4f}   <- the number to beat")
