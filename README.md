@@ -13,6 +13,39 @@ Built with the Strands Agents SDK for the AWS Agents for Humans Hackathon.
 > Not legal advice. This computes dates and drafts a document. It does not tell anyone
 > what to do, and it does not practise law.
 
+## Architecture
+
+```mermaid
+flowchart LR
+    L[Denial letter] --> N[Amazon Nova Lite<br/>reads the letter]
+    N --> T[Taxonomy lookup<br/>state's own filings, deterministic]
+    T --> A
+
+    subgraph A[Strands Agent on Amazon Bedrock, Claude Haiku 4.5]
+        direction TB
+        D[compute_filing_deadline<br/>statute engine, no model<br/>HSC 1374.30 · Civ. Code 10, 14, 7 · Gov. Code 6700]
+        P[find_precedent<br/>22,090 published IMR decisions<br/>cohort rate + reviewer reasoning]
+        W[drafts the appeal]
+        F[file_appeal<br/>Strands interrupt]
+        D --> W
+        P --> W
+        W --> F
+    end
+
+    F -->|pauses| H{Human approves<br/>this exact letter?}
+    H -->|yes| OK[Filed]
+    H -->|no| NO[Not filed]
+
+    C[(California DMHC<br/>42,749 published decisions<br/>data.chhs.ca.gov)] --> P
+    S[(leginfo.legislature.ca.gov)] -.cited by.-> D
+```
+
+Two models, two deterministic engines, one gate. Nova reads unstructured correspondence
+because that needs a model; the taxonomy and the deadline are lookups and arithmetic
+against published sources, so no model is allowed near them. Haiku writes the letter,
+which is the artifact every number below is measured on. Nothing is filed until a person
+approves that specific letter.
+
 ## Why
 
 Last year insurers denied roughly **85 million** in-network claims on HealthCare.gov.
