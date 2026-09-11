@@ -1,0 +1,11 @@
+{
+  "precedent_corpus": 22090,
+  "held_out": 3276,
+  "with_rate": 2998,
+  "with_exemplar": 2755,
+  "tightest_tier": 2373,
+  "no_exemplar": 521,
+  "rate_min": 0.05,
+  "rate_max": 0.986,
+  "rate_median": 0.65
+}

@@ -1,0 +1,10 @@
+{
+  "corpus_total": 42749,
+  "train": 22090,
+  "train_years": [
+    2016,
+    2024
+  ],
+  "test": 3276,
+  "test_from_year": 2025
+}

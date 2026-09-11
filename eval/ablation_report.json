@@ -1,0 +1,55 @@
+{
+  "runs": 6,
+  "model": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+  "record_ablation": {
+    "with_record": {
+      "pct_claims": 12,
+      "sourced": 12
+    },
+    "without_record": {
+      "pct_claims": 6,
+      "letters_asserting_a_rate": 3,
+      "sourced": 0,
+      "asserted_rates": [
+        "40%",
+        "50%",
+        "60%"
+      ]
+    }
+  },
+  "engine_ablation": {
+    "statutory_deadline": "2027-01-19",
+    "plan_silent": {
+      "error_days": [
+        -186,
+        -42,
+        -42,
+        -42,
+        -42,
+        -2
+      ],
+      "late": 0,
+      "early": 6,
+      "exact": 0
+    },
+    "plan_answered_day_120": {
+      "error_days": [
+        -279,
+        86,
+        86,
+        86,
+        86,
+        86
+      ],
+      "late": 5,
+      "early": 1,
+      "exact": 0
+    }
+  },
+  "gate_reached": {
+    "A": 6,
+    "B": 6,
+    "C1": 6,
+    "C2": 6
+  }
+}

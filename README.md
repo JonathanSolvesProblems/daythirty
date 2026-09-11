@@ -83,8 +83,9 @@ California publishes every Independent Medical Review determination it has ever 
 physician reviewer, including the reviewer's written reasoning.
 
 Splits are temporal and leak-controlled (`eval/build_split.py`): precedent is retrieved
-only from 2016 to 2024, held-out cases are 2025 to 2026, and the reviewer's narrative is
-stripped from every held-out case because it states the verdict outright. Cases before
+only from the 22,090 decisions of 2016 to 2024, held-out cases are the 3,276 of 2025 to
+2026, and the reviewer's narrative is stripped from every held-out case because it
+states the verdict outright. Cases before
 2016 are dropped entirely: DMHC only began publishing the structured narrative in 2015,
 so earlier records are unstructured prose and cannot serve as precedent
 (`eval/structure_by_year.py`).
@@ -182,20 +183,54 @@ Checked mechanically, not by asking a model to grade a model
 specific in the letter (percentages, doses, named clinical authorities) is matched
 against it.
 
-Across 22 letters in two runs:
+Across 20 letters on 20 different real denials:
 
 | | |
 |---|---|
-| Numeric claims grounded in the record | **19/20 (95%)** |
-| Named clinical authorities grounded | **20/20 (100%)** |
+| Numeric claims grounded in the record | **18/18 (100%)** |
+| Named clinical authorities grounded | **12/13 (92.3%)** |
 | Negative control: fabricated claims correctly flagged | **7/7** |
 
 The negative control exists because a checker that cannot fail proves nothing. Seven
 plausible fabrications (`42.7%`, `InterQual`, `American Academy of Ophthalmology` and
 others) are tested against the union of all captured context and must all be caught.
 
-The one ungrounded numeric appeared in one run and not the other, so this varies. It is
-reported as 19/20 rather than quoting the clean run.
+The one miss is real: a letter cited the American Society of Addiction Medicine where the
+retrieved record had not named it. ASAM criteria do govern that kind of case, so the
+citation is plausible, but the agent did not get it from the record and the check marks
+it down. Earlier, smaller runs also showed one ungrounded number in ten letters, so
+expect this to vary by a claim or two between runs rather than treating 100% as fixed.
+
+## What each piece contributes, measured by switching it off
+
+Every entry at a sponsored hackathon asserts its tools were essential. This measures it
+(`eval/ablation.py`, report in `eval/ablation_report.json`). Same model, same six real
+denials, same prompt, one tool removed at a time.
+
+**California's published record switched off.** The model argues from its own knowledge.
+
+| | rate claims in the letters | sourced |
+|---|---|---|
+| with the record | 12 | **12 (100%)** |
+| without it | 6, in 3 of 6 letters | **0** |
+
+Without the record the model asserted overturn rates of **40%, 50% and 60%** with nothing
+to cite. The state's published figures for those same cohorts run from 64% to 95%. The
+numbers were not just unsourced, they were wrong in the direction that talks a person out
+of filing.
+
+**The statute engine switched off.** The model is told the rule in words, the way a
+careful person would look it up, and asked to compute the date itself.
+
+| timeline | exact | early | **late** | error in days |
+|---|---|---|---|---|
+| plan silent | 0/6 | 6 | 0 | mostly −42 |
+| plan answered on day 120 | 0/6 | 1 | **5** | **+86** in all five |
+
+The −42 is six months counted from the denial letter instead of from the qualifying
+event. The +86 is six months counted from the plan's answer. **Late means the filing
+window is missed and the appeal is lost.** Told the rule, the model still made the exact
+mistake the project exists to prevent, five times out of six.
 
 ## Running it
 

@@ -267,8 +267,21 @@ encouragement. An appeal is still theirs to make.
 """
 
 
-def build_agent(model_id: str = DRAFTING_MODEL, region: str = REGION) -> Agent:
-    """The agent as the demo runs it."""
+ALL_TOOLS = [compute_filing_deadline, find_precedent, file_appeal]
+
+
+def build_agent(
+    model_id: str = DRAFTING_MODEL,
+    region: str = REGION,
+    tools: list | None = None,
+    system_prompt: str = SYSTEM_PROMPT,
+) -> Agent:
+    """The agent as the demo runs it.
+
+    `tools` and `system_prompt` are overridable so the ablation in eval/ablation.py can
+    run the identical model with a tool removed and measure what that tool contributed.
+    The demo never passes them.
+    """
     return Agent(
         model=BedrockModel(
             model_id=model_id,
@@ -279,6 +292,6 @@ def build_agent(model_id: str = DRAFTING_MODEL, region: str = REGION) -> Agent:
             # instead of calling the tool, which loses the approval gate entirely.
             temperature=0.1,
         ),
-        tools=[compute_filing_deadline, find_precedent, file_appeal],
-        system_prompt=SYSTEM_PROMPT,
+        tools=ALL_TOOLS if tools is None else tools,
+        system_prompt=system_prompt,
     )

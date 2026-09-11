@@ -61,8 +61,10 @@ def case_of(row: dict) -> dict:
 
 def main() -> None:
     train, test = [], []
+    total_rows = 0
     with RAW.open(newline="", encoding="utf-8-sig") as fh:
         for row in csv.DictReader(fh):
+            total_rows += 1
             det = row["Determination"]
             if det not in (OVERTURNED, "Upheld Decision of Health Plan"):
                 continue
@@ -94,6 +96,16 @@ def main() -> None:
 
     print(f"train ({TRAIN_FROM_YEAR}-{TEST_FROM_YEAR - 1}): {len(train):,}")
     print(f"test  (>= {TEST_FROM_YEAR}):      {len(test):,}")
+
+    # Written so eval/check_claims.py can hold the README to these counts.
+    (ROOT / "eval" / "split_report.json").write_text(
+        json.dumps({
+            "corpus_total": total_rows,
+            "train": len(train), "train_years": [TRAIN_FROM_YEAR, TEST_FROM_YEAR - 1],
+            "test": len(test), "test_from_year": TEST_FROM_YEAR,
+        }, indent=2),
+        encoding="utf-8",
+    )
     base = sum(r["label"] for r in test) / len(test)
     print(f"test overturn base rate:  {base:.4f}")
     print(f"majority-class accuracy:  {max(base, 1 - base):.4f}   <- the number to beat")

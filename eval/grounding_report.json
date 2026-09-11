@@ -1,14 +1,16 @@
 {
-  "letters_analysed": 12,
+  "letters_analysed": 20,
   "numeric_claims": {
-    "grounded": 11,
-    "total": 11
+    "grounded": 18,
+    "total": 18
   },
   "named_authorities": {
-    "grounded": 10,
-    "total": 10
+    "grounded": 12,
+    "total": 13
   },
-  "unsupported": {},
+  "unsupported": {
+    "NAME American Society of Addiction Medicine": 1
+  },
   "negative_control": {
     "caught": 7,
     "total": 7,
@@ -22,7 +24,7 @@
       "World Health Organization"
     ]
   },
-  "distinct_decimals_in_context": 16,
+  "distinct_decimals_in_context": 22,
   "model": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
   "note": "Grounding is checked mechanically against exactly what the tools returned to the model, captured by a Strands AfterToolCallEvent hook. No model grades another model here. The negative control exists because a checker that cannot fail proves nothing."
 }

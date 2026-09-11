@@ -66,6 +66,23 @@ def main() -> None:
         print(f"  median {statistics.median(rates):.1%}, "
               f"min {min(rates):.1%}, max {max(rates):.1%}")
 
+    tightest = ex_tiers.get("DiagnosisSubCategory+TreatmentSubCategory+Type", 0)
+    report = {
+        "precedent_corpus": len(idx),
+        "held_out": n,
+        "with_rate": with_rate,
+        "with_exemplar": with_exemplars,
+        "tightest_tier": tightest,
+        "no_exemplar": n - with_exemplars,
+        "rate_min": round(min(rates), 4) if rates else None,
+        "rate_max": round(max(rates), 4) if rates else None,
+        "rate_median": round(statistics.median(rates), 4) if rates else None,
+    }
+    (ROOT / "eval" / "coverage_report.json").write_text(
+        json.dumps(report, indent=2), encoding="utf-8"
+    )
+    print(f"\nwritten: eval/coverage_report.json")
+
 
 if __name__ == "__main__":
     sys.exit(main())
