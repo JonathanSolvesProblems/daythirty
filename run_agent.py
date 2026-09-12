@@ -114,7 +114,7 @@ my appeal."""
         approved, note = True, "approved non-interactively"
         print("  [--approve] approving without prompting")
     else:
-        answer = input("  File this appeal? [y/N] ").strip().lower()
+        answer = input("  Approve this application for filing? [y/N] ").strip().lower()
         approved = answer in {"y", "yes"}
         note = "approved by the patient" if approved else "declined by the patient"
 

@@ -29,6 +29,10 @@ dist/
 scratch/
 *.log
 
+# Approved applications the web surface writes on approval. They are a person's
+# appeal, and the demo's are built from published cases; neither belongs in git.
+outbox/
+
 # Demo video working files. The narration recording and captured clips are large
 # and belong on the video host, not in the repo.
 broll/

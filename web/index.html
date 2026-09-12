@@ -94,6 +94,10 @@ button{font:inherit;cursor:pointer}
 .appeal .draft{white-space:pre-wrap;font:14px/1.55 var(--letter);color:#1C1F24;min-height:80px}
 .appeal .draft .cursor{display:inline-block;width:7px;height:15px;background:var(--mark);vertical-align:-2px;animation:blink 1s steps(2) infinite}
 @keyframes blink{50%{opacity:0}}
+/* what the agent says after the decision. It is not the letter, so it does not
+   overwrite the letter; it sits under the signature line in the agent's own hand. */
+.appeal .after{display:none;margin-top:22px;padding-top:14px;border-top:1px solid var(--rule);font:400 15.5px/1.4 var(--hand);color:var(--mark);white-space:pre-wrap}
+.appeal .after.on{display:block}
 
 /* signature gate */
 .gate{margin-top:34px;padding-top:10px;display:none}
@@ -163,11 +167,12 @@ button{font:inherit;cursor:pointer}
           <svg viewBox="0 0 600 40" preserveAspectRatio="none"><path id="sigline" d="M0 30 C 120 26, 240 34, 360 29 S 560 31, 600 28" fill="none" stroke="#1C1F24" stroke-width="1.2" filter="url(#rough)"/></svg>
         </div>
         <div class="actions">
-          <button class="btn primary" id="sign">Sign and file</button>
-          <button class="btn" id="decline">Don't file</button>
+          <button class="btn primary" id="sign">Sign it</button>
+          <button class="btn" id="decline">Don't sign</button>
           <span class="why" id="gateWhy"></span>
         </div>
       </div>
+      <div class="after" id="after"></div>
       <div class="stamp" id="stamp"></div>
     </div>
   </div>
@@ -289,6 +294,8 @@ $('#run').onclick = async () => {
   letterEl.textContent = ta.value; letterEl.hidden = false; ta.hidden = true;
   clearMarks(); margin.innerHTML = ''; draftText = '';
   $('#appeal').classList.remove('on'); $('#gate').classList.remove('on'); $('#stamp').className='stamp';
+  $('#after').textContent = ''; $('#after').classList.remove('on');
+  let gated = false, afterText = '';
   const t0 = performance.now();
 
   const r = await fetch('/api/run', {method:'POST', headers:{'content-type':'application/json'},
@@ -344,11 +351,19 @@ $('#run').onclick = async () => {
     }
     else if(e.type === 'text'){
       $('#appeal').classList.add('on');
-      draftText += e.delta;
-      $('#draft').innerHTML = escapeHtml(draftText.replace(/\*\*/g, '')) + '<span class="cursor"></span>';
+      if(gated){
+        // The agent talking after the decision. Keep the approved letter where it is.
+        afterText += e.delta;
+        $('#after').textContent = afterText.replace(/\*\*/g, '');
+        $('#after').classList.add('on');
+      } else {
+        draftText += e.delta;
+        $('#draft').innerHTML = escapeHtml(draftText.replace(/\*\*/g, '')) + '<span class="cursor"></span>';
+      }
       layoutNotes();
     }
     else if(e.type === 'gate'){
+      gated = true;
       $('#appeal').classList.add('on');
       $('#draft').textContent = (e.letter || draftText).replace(/\*\*/g, '');
       $('#gate').classList.add('on');
@@ -360,9 +375,19 @@ $('#run').onclick = async () => {
     else if(e.type === 'done'){
       es.close(); $('#run').disabled = false;
       const st = $('#stamp');
-      if(e.filed){ st.textContent = 'FILED'; st.className = 'stamp on'; $('#stage').textContent = 'Filed.'; }
-      else { st.textContent = 'NOT FILED'; st.className = 'stamp no on'; $('#stage').textContent = 'Not filed. Nothing left your hands.'; }
+      if(e.approved){
+        st.textContent = 'APPROVED'; st.className = 'stamp on';
+        $('#stage').textContent = `Approved. Ready to file, due ${fmtDate(e.deadline)}.`;
+        // DMHC has no API. The honest end of the run is the finished application, on
+        // disk, with the real channels it goes through. Say so on the page, not in a README.
+        const f = e.filing || {};
+        note(`Ready to file.<br>Due <b class="num">${fmtDate(e.deadline)}</b>.` +
+          `<span class="small">Saved to ${escapeHtml(e.outbox||'outbox/')}. DMHC takes it online at ${escapeHtml(f.online||'')}, by fax to <span class="num">${escapeHtml(f.fax||'')}</span>, or by mail. There is no API, so that last step is yours.</span>`,
+          $('#gate'), 5);
+      }
+      else { st.textContent = 'NOT SIGNED'; st.className = 'stamp no on'; $('#stage').textContent = 'Not signed. Nothing left your hands.'; }
       $('#sign').disabled = true; $('#decline').disabled = true;
+      $('#appeal').scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block:'end'});
     }
     else if(e.type === 'error'){
       es.close(); $('#run').disabled = false; $('#err').textContent = e.message;

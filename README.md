@@ -33,7 +33,7 @@ flowchart LR
     end
 
     F -->|pauses| H{Human approves<br/>this exact letter?}
-    H -->|yes| OK[Filed]
+    H -->|yes| OK[Application package<br/>due date + DMHC channels<br/>the person files it]
     H -->|no| NO[Not filed]
 
     C[(California DMHC<br/>42,749 published decisions<br/>data.chhs.ca.gov)] --> P
@@ -44,7 +44,9 @@ Two models, two deterministic engines, one gate. Nova reads unstructured corresp
 because that needs a model; the taxonomy and the deadline are lookups and arithmetic
 against published sources, so no model is allowed near them. Haiku writes the letter,
 which is the artifact every number below is measured on. Nothing is filed until a person
-approves that specific letter.
+approves that specific letter, and nothing is filed by the software after that either:
+DMHC has no API, so approval produces the finished application with the due date and the
+real channels (online, fax, mail), and the person sends it. The page says so on screen.
 
 ## Why
 
@@ -195,7 +197,10 @@ Three tools and a gate (`src/daythirty/agent.py`):
   because a hallucinated deadline is the one error that cannot be recovered from.
 - `find_precedent` is deterministic retrieval over the state's published record.
 - `file_appeal` raises a Strands interrupt. Nothing is filed without a person approving
-  that specific letter.
+  that specific letter. On approval it returns the application package: the statement,
+  the due date, and where DMHC accepts it (www.HealthHelp.ca.gov, fax 916-255-5241, or
+  the Help Center's mailing address, verified 2026-09-12). The web surface writes that
+  package to `outbox/`. The tool never claims a submission it did not make.
 
 The model writes the appeal. That is deliberate: the letter is the artifact the numbers
 below are measured on, so the model has to be what produces it.
@@ -324,6 +329,10 @@ Requires AWS credentials with Bedrock access in `us-east-1`.
   case. The clinical facts in every letter are the state's; the letterhead is not. Note
   this also makes the intake score conservative in one direction and generous in another:
   the letter uses DMHC's own clinical descriptors rather than a real plan's wording.
+- **Filing is a hand-off, not an API call.** DMHC accepts IMR applications through its
+  online form, by fax or by mail, and publishes no API. Approval therefore ends with the
+  finished application and its due date in the person's hands, and the page says
+  "that last step is yours" rather than stamping something it did not do.
 
 ## Status
 

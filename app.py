@@ -27,13 +27,16 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from strands.hooks import AfterToolCallEvent, BeforeToolCallEvent  # noqa: E402
 
-from daythirty.agent import build_agent  # noqa: E402
+from daythirty.agent import DMHC_FILING, build_agent, filing_package  # noqa: E402
 from daythirty.intake import parse_denial_letter, render_denial_letter  # noqa: E402
 from daythirty.precedent import PrecedentIndex  # noqa: E402
 
 app = FastAPI(title="Day Thirty")
 WEB = ROOT / "web"
 TEST = ROOT / "data" / "split" / "test.jsonl"
+# Where an approved application lands, as a file a person can print or upload. DMHC has
+# no API, so this is the real end of the run: the package, not a pretend submission.
+OUTBOX = ROOT / "outbox"
 
 _index: PrecedentIndex | None = None
 _cases: list[dict] | None = None
@@ -213,6 +216,7 @@ my appeal."""
             itr = result.interrupts[0]
             reason = itr.reason if isinstance(itr.reason, dict) else {}
             run["interrupt_id"] = itr.id
+            run["gate"] = reason
             _emit(
                 q, "gate",
                 letter=reason.get("letter", ""),
@@ -221,7 +225,7 @@ my appeal."""
                 seconds=round(time.time() - t0, 1),
             )
         else:
-            _emit(q, "done", filed=False, text=str(result),
+            _emit(q, "done", approved=False, text=str(result),
                   seconds=round(time.time() - t0, 1),
                   note="The agent finished without reaching the approval gate.")
             run["finished"] = True
@@ -275,16 +279,28 @@ def decide(run_id: str, d: Decision):
         q: queue.Queue = run["q"]
         try:
             _emit(q, "stage", name="decision",
-                  label="Filing" if d.approved else "Not filing")
+                  label="Preparing the application" if d.approved else "Not filing")
+            note = d.note or ("approved by the patient" if d.approved else
+                              "declined by the patient")
             resumed = run["agent"]([{
                 "interruptResponse": {
                     "interruptId": run["interrupt_id"],
-                    "response": {"approved": d.approved, "note": d.note or
-                                 ("approved by the patient" if d.approved else
-                                  "declined by the patient")},
+                    "response": {"approved": d.approved, "note": note},
                 }
             }])
-            _emit(q, "done", filed=d.approved, text=str(resumed))
+            gate = run.get("gate") or {}
+            outbox = None
+            if d.approved:
+                OUTBOX.mkdir(exist_ok=True)
+                path = OUTBOX / f"{date.today().isoformat()}-imr-application-{run_id}.txt"
+                path.write_text(
+                    filing_package(gate.get("letter", ""), gate.get("deadline", ""),
+                                   gate.get("summary", ""), note),
+                    encoding="utf-8",
+                )
+                outbox = path.relative_to(ROOT).as_posix()
+            _emit(q, "done", approved=d.approved, text=str(resumed),
+                  deadline=gate.get("deadline"), outbox=outbox, filing=DMHC_FILING)
         except Exception as exc:  # noqa: BLE001
             _emit(q, "error", message=f"{type(exc).__name__}: {exc}")
         run["finished"] = True

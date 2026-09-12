@@ -14,7 +14,7 @@ So: Day Thirty. An agent built on the Strands Agents SDK and Amazon Bedrock that
 2. **The deadline is computed from the statute.** No model touches the date. Every rule cites its provision: § 1374.30(k) for six months, § 1374.30(j)(3) for the qualifying event, Civ. Code § 14 for calendar-month arithmetic, § 10 for the holiday exclusion, § 7 and Gov. Code § 6700 for what counts as a holiday.
 3. **It retrieves how California actually decided comparable denials.** The state publishes every IMR determination it has ever made: 42,749 of them, each decided by a state-contracted physician with the reasoning attached. Day Thirty argues only from what those reviewers found persuasive.
 4. **Claude Haiku 4.5 drafts the appeal**, grounded in that record.
-5. **It stops.** A Strands interrupt hands the exact letter to the person. Nothing is filed without approval.
+5. **It stops.** A Strands interrupt hands the exact letter to the person. Nothing is filed without approval, and the software does not file after it either: DMHC publishes no API for IMR applications, so approval produces the finished package with the due date and DMHC's real channels (online, fax, mail), and the person sends it. The page says "that last step is yours" rather than stamping something it did not do.
 
 ## The Strands pieces that mattered
 

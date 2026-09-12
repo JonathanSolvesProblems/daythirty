@@ -74,9 +74,9 @@ def main() -> int:
 
         page.click("#sign")
         page.wait_for_selector("#stamp.on", timeout=60000)
-        page.wait_for_timeout(500)
-        page.screenshot(path=str(OUT / f"5-filed{suffix}.png"))
-        print("5 filed")
+        page.wait_for_timeout(900)  # the "ready to file" note fades in
+        page.screenshot(path=str(OUT / f"5-approved{suffix}.png"))
+        print("5 approved")
 
         browser.close()
     print(f"written to {OUT.relative_to(ROOT)}")

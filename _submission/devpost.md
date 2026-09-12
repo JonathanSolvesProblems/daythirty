@@ -9,7 +9,7 @@ Day Thirty
 ## Elevator pitch
 
 ```
-Your insurance appeal, argued from 22,090 decisions California's own physicians published, filed before the day-thirty clock runs out.
+Your insurance appeal, argued from 22,090 decisions California's own physicians published, ready to sign before the day-thirty clock runs out.
 ```
 
 ## Track
@@ -49,7 +49,7 @@ Day Thirty works a California health insurance denial end to end, in the backgro
 2. The filing deadline is computed from the statute, with every rule citing its provision: HSC § 1374.30(k) and (j)(3), Civ. Code § 14, § 10, § 7, Gov. Code § 6700. No model touches the date, because a hallucinated deadline is the one error that cannot be recovered from.
 3. It retrieves how California actually decided comparable denials, from the 22,090 Independent Medical Review determinations the state published between 2016 and 2024, each one made by a state-contracted physician reviewer with the reasoning attached.
 4. Claude Haiku 4.5 on Bedrock drafts the appeal, arguing only from what those reviewers found persuasive.
-5. It stops. A Strands interrupt hands the exact letter to a person. Nothing is filed without approval.
+5. It stops. A Strands interrupt hands the exact letter to a person. Nothing is filed without approval, and nothing is filed by the software after it either: DMHC has no API, so approval produces the finished application with the due date and DMHC's real channels (online, fax, mail), and the person sends it. The page says "that last step is yours" on screen.
 
 ## How I built it
 
@@ -93,7 +93,7 @@ eval/check_claims.py reads every measurement report and fails the build if the R
 
 ## What's next
 
-The astronomical holidays in Gov. Code § 6700 (Lunar New Year, Diwali) are supplied as data and the tables are empty; every result says so. Semantic retrieval for the taxonomy gap. Other states' clocks. And a real filing integration with DMHC's portal, which today is the approval gate's job to hand off.
+The astronomical holidays in Gov. Code § 6700 (Lunar New Year, Diwali) are supplied as data and the tables are empty; every result says so. Semantic retrieval for the taxonomy gap. Other states' clocks. And the last step: DMHC publishes no API for IMR applications, so today approval hands the person the finished package and the channels, and they send it. If DMHC ever exposes one, that is where the gate's "yes" would go.
 ```
 
 ## Video
@@ -111,7 +111,7 @@ jon.knight.andrei@gmail.com
 
 ## Notes, not for pasting
 
-- The elevator pitch is 134 characters. It carries the two things no competitor can say: the corpus, and the day-thirty mechanism.
+- The elevator pitch is 142 characters. It carries the two things no competitor can say: the corpus, and the day-thirty mechanism. It says "ready to sign", not "filed", because DMHC has no API and the software does not file; the sentence must never be more real than the artifact.
 - Every figure in "About the project" matches README.md, which `eval/check_claims.py` holds to the reports on disk. If a number changes, change the README first, let the check pass, then update this file.
 - Track: Everyday Agents was chosen over Professional and Good Neighbor. The track description ("only ping you when there's a real decision to make") is the approval gate in the organisers' own words. Professional is a defensible alternative framed around patient advocates; Good Neighbor is where Instanter most likely sits and is the head-to-head to avoid.
 - Video is the only field that cannot be filled until it is recorded.

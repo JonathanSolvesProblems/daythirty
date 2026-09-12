@@ -8,7 +8,11 @@ Three tools and one gate:
   find_precedent            Deterministic retrieval over 22,090 decisions California
                             published. The model reads them; it does not invent them.
   file_appeal               Raises a human interrupt. Nothing is ever filed without a
-                            person approving that specific letter.
+                            person approving that specific letter. On approval it hands
+                            back the finished application with DMHC's real filing
+                            channels and the due date. DMHC has no API: the application
+                            goes in online, by fax or by mail, so the last step is the
+                            person's, and the tool says so rather than pretending.
 
 The model writes the appeal. That is deliberate: the drafted letter is the artifact the
 headline number is measured on, so the sponsor's model has to be the thing producing it,
@@ -177,6 +181,42 @@ def find_precedent(
     }
 
 
+# How DMHC actually accepts an IMR application. Verified against dmhc.ca.gov on
+# 2026-09-12. There is no API, which is why approval hands the person a finished
+# package rather than claiming a submission the software cannot make.
+DMHC_FILING = {
+    "online": "www.HealthHelp.ca.gov",
+    "form": "https://www.dmhc.ca.gov/FileaComplaint/IndependentMedicalReviewComplaintForms.aspx",
+    "mail": "Help Center, Department of Managed Health Care, 980 9th Street, Suite 500, "
+            "Sacramento, CA 95814",
+    "fax": "916-255-5241",
+    "phone": "1-888-466-2219",
+}
+
+
+def filing_package(letter: str, deadline: str, summary: str, note: str = "") -> str:
+    """The approved application as a person would print or upload it."""
+    lines = [
+        "INDEPENDENT MEDICAL REVIEW APPLICATION, approved for filing",
+        f"Must reach DMHC on or before: {deadline}",
+        "",
+        "Where it goes (DMHC accepts any of these; online is fastest):",
+        f"  Online: {DMHC_FILING['online']}",
+        f"  Fax:    {DMHC_FILING['fax']}",
+        f"  Mail:   {DMHC_FILING['mail']}",
+        f"  Help:   {DMHC_FILING['phone']}",
+        f"  Form:   {DMHC_FILING['form']}",
+        "  Attach this statement to the IMR Application/Complaint Form, sign the form,",
+        "  and include the denial letter.",
+        "",
+        f"Summary: {summary}",
+    ]
+    if note:
+        lines.append(f"Note from the person approving: {note}")
+    lines += ["", "STATEMENT", "", letter.strip(), ""]
+    return "\n".join(lines)
+
+
 @tool(context=True)
 def file_appeal(
     tool_context: ToolContext,
@@ -184,15 +224,17 @@ def file_appeal(
     deadline: str,
     summary: str,
 ) -> str:
-    """Submit the drafted appeal. Requires explicit human approval of this exact letter.
+    """Hand the drafted appeal to a person for approval. Requires explicit human approval
+    of this exact letter.
 
     Call this only once the letter is complete. Execution pauses here until a person
-    approves or rejects.
+    approves or rejects. On approval the finished application comes back with DMHC's
+    filing channels and the due date; the person files it, because DMHC has no API.
     """
     decision = tool_context.interrupt(
         name="approve_filing",
         reason={
-            "action": "File IMR application with California DMHC",
+            "action": "Approve this IMR application for filing with California DMHC",
             "deadline": deadline,
             "summary": summary,
             "letter": letter,
@@ -206,10 +248,12 @@ def file_appeal(
         note = ""
 
     if not approved:
-        return f"NOT FILED. The person declined. {note}".strip()
+        return f"NOT APPROVED. The person declined. Nothing has been filed. {note}".strip()
     return (
-        f"FILED. IMR application submitted to California DMHC, on or before {deadline}. "
-        f"{note}".strip()
+        f"APPROVED. The application is finished and ready to file with California DMHC, "
+        f"due on or before {deadline}. Nothing has been sent: DMHC takes it online at "
+        f"{DMHC_FILING['online']}, by fax to {DMHC_FILING['fax']}, or by mail, and that "
+        f"step is the person's.\n\n" + filing_package(letter, deadline, summary, note)
     )
 
 
@@ -235,7 +279,12 @@ will be printed and mailed: no markdown, no asterisks, no # headings. Section ti
 just lines of text.
 
 4. Call `file_appeal` with the finished letter. A person approves or rejects it. You do \
-not file anything yourself.
+not file anything yourself, and neither does the tool: DMHC has no API, so on approval \
+the person receives the finished application with where to send it and the due date. \
+After the tool returns, tell the person in two or three sentences what happened, the \
+date it must reach DMHC, and where it goes. The person sees only your words, not the \
+tool's output, so never refer to anything "above": if you mention mail, write the full \
+mailing address out. Never say it was submitted or filed.
 
 Hard rules:
 
