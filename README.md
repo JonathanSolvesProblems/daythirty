@@ -265,6 +265,23 @@ event. The +86 is six months counted from the plan's answer. **Late means the fi
 window is missed and the appeal is lost.** Told the rule, the model still made the exact
 mistake the project exists to prevent, five times out of six.
 
+## Deployed on Bedrock AgentCore
+
+The same agent runs in AWS's managed runtime, so it works in the background rather than
+on a laptop (`agentcore_app.py`). Deployed 2026-09-12 to
+`arn:aws:bedrock-agentcore:us-east-1:533354334997:runtime/daythirty-SGLNmB3qzW`, built as
+an ARM64 container by CodeBuild in 41 seconds.
+
+Invoked with a real published GERD denial (`scripts/invoke_agentcore.py --case 5`), the
+runtime returned in **14.2 seconds** round trip with the intake, the statutory deadline
+(qualifying event 2026-07-18, deadline 2027-01-19), and a 2,361-character drafted appeal
+stopped at the gate. The response says, in words, that nothing has been filed and that
+filing requires a person. The runtime never files.
+
+AWS surface in the judged path: Strands Agents SDK, Bedrock (Amazon Nova Lite for
+intake, Claude Haiku 4.5 for drafting), AgentCore Runtime, ECR, CodeBuild, S3,
+CloudWatch. Every resource is listed in `TEARDOWN.md` with the date it comes down.
+
 ## Running it
 
 ```

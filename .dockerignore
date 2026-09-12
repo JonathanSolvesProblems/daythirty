@@ -1,0 +1,18 @@
+# What the AgentCore container does not need.
+.venv/
+.git/
+.design/
+_submission/
+data/raw/
+data/index/
+eval/
+tests/
+web/
+scripts/screenshots.py
+scripts/build_embeddings.py
+**/__pycache__/
+*.png
+*.md
+!README.md
+app.py
+run_agent.py

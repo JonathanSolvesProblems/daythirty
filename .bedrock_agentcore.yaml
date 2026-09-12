@@ -1,0 +1,62 @@
+default_agent: daythirty
+agents:
+  daythirty:
+    name: daythirty
+    language: python
+    node_version: '20'
+    entrypoint: C:/Users/Jon_A/OneDrive/Desktop/Projects/Time3/AgentsForHumans/agentcore_app.py
+    deployment_type: container
+    runtime_type: null
+    platform: linux/arm64
+    container_runtime: none
+    source_path: C:\Users\Jon_A\OneDrive\Desktop\Projects\Time3\AgentsForHumans
+    aws:
+      execution_role: arn:aws:iam::533354334997:role/AmazonBedrockAgentCoreSDKRuntime-us-east-1-e4277ba907
+      execution_role_auto_create: false
+      account: '533354334997'
+      region: us-east-1
+      ecr_repository: 533354334997.dkr.ecr.us-east-1.amazonaws.com/bedrock-agentcore-daythirty
+      ecr_auto_create: false
+      s3_path: null
+      s3_auto_create: false
+      network_configuration:
+        network_mode: PUBLIC
+        network_mode_config: null
+      protocol_configuration:
+        server_protocol: HTTP
+      observability:
+        enabled: true
+      lifecycle_configuration:
+        idle_runtime_session_timeout: null
+        max_lifetime: null
+    bedrock_agentcore:
+      agent_id: daythirty-SGLNmB3qzW
+      agent_arn: arn:aws:bedrock-agentcore:us-east-1:533354334997:runtime/daythirty-SGLNmB3qzW
+      agent_session_id: e139f8bd-9be7-405b-ad39-cccc3134ae06
+    codebuild:
+      project_name: bedrock-agentcore-daythirty-builder
+      execution_role: arn:aws:iam::533354334997:role/AmazonBedrockAgentCoreSDKCodeBuild-us-east-1-e4277ba907
+      source_bucket: bedrock-agentcore-codebuild-sources-533354334997-us-east-1
+    memory:
+      mode: STM_ONLY
+      memory_id: null
+      memory_arn: null
+      memory_name: daythirty_memory
+      event_expiry_days: 30
+      first_invoke_memory_check_done: false
+      was_created_by_toolkit: false
+    identity:
+      credential_providers: []
+      workload: null
+    aws_jwt:
+      enabled: false
+      audiences: []
+      signing_algorithm: ES384
+      issuer_url: null
+      duration_seconds: 300
+    authorizer_configuration: null
+    request_header_configuration: null
+    oauth_configuration: null
+    api_key_env_var_name: null
+    api_key_credential_provider_name: null
+    is_generated_by_agentcore_create: false
