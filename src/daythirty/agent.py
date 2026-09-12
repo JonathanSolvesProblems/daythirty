@@ -230,7 +230,9 @@ say so plainly rather than filling the gap.
 3. Draft the appeal letter, in this same turn. Write it as the patient, addressed to the \
 California Department of Managed Health Care. Ground every clinical argument in the \
 reasoning independent reviewers actually gave in the returned cases. Refer to those \
-findings in general terms; do not fabricate case numbers.
+findings in general terms; do not fabricate case numbers. The letter is plain text that \
+will be printed and mailed: no markdown, no asterisks, no # headings. Section titles are \
+just lines of text.
 
 4. Call `file_appeal` with the finished letter. A person approves or rejects it. You do \
 not file anything yourself.

@@ -271,9 +271,17 @@ mistake the project exists to prevent, five times out of six.
 python -m venv .venv && .venv/Scripts/pip install -r requirements.txt
 python scripts/fetch_corpus.py        # 85 MB from the state's open data portal
 python eval/build_split.py            # temporal, leak-controlled splits
-python run_agent.py                   # stops and asks you to approve
-pytest                                # 19 tests, no environment setup needed
+python scripts/build_taxonomy.py      # the state's own category filings
+.venv/Scripts/uvicorn app:app --port 8030   # then open http://127.0.0.1:8030
+python run_agent.py                   # the same run, in a terminal
+pytest                                # 20 tests, no environment setup needed
 ```
+
+The web surface (`app.py`, `web/index.html`) streams every stage as it happens. The
+insurer's letter is typeset in the insurer's own boring type; everything Day Thirty does
+is drawn on it by hand, in a litigator's ink, and the gate is a signature line. Design
+decisions and their reasons are in `.design/manifest.json` and at the top of the
+stylesheet.
 
 Requires AWS credentials with Bedrock access in `us-east-1`.
 

@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day Thirty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ------------------------------------------------------------------------------------
+   Day Thirty. The redline.
+
+   Category convention avoided: insurtech / legal-tech SaaS. White or navy, a blue
+   accent, a progress stepper, rounded cards, a chat bubble. All of it says "the system".
+
+   Metaphor: the insurer's typeset denial letter, marked up by hand in a litigator's ink
+   by someone on the patient's side. The gate is a signature line, because you sign an
+   appeal to file it.
+
+   The letter is set in the insurer's own boring type because it is theirs. Everything
+   Day Thirty does is DRAWN, because a person is working through this, not a pipeline.
+   UI chrome is Atkinson Hyperlegible because the person reading this is sick and it was
+   designed for low-vision readers. The canvas is paper because a dark default would
+   misrepresent the material.
+   ------------------------------------------------------------------------------------ */
+:root{
+  --desk:#DDE1E6; --paper:#F3F5F7; --ink:#1C1F24; --rule:#C9CED6;
+  /* on the sheet */
+  --mark:#7A1F2E; --wash:rgba(122,31,46,.14); --muted:#5C636E;
+  /* on the desk: same ink, but the desk changes with the theme and the sheet does not,
+     so text on the desk needs its own contrast-checked values */
+  --mark-desk:#7A1F2E; --muted-desk:#5C636E; --ink-desk:#1C1F24;
+  --hand:'Kalam',cursive; --ui:'Atkinson Hyperlegible',system-ui,sans-serif;
+  --letter:Arial,Helvetica,sans-serif;
+  --draw:700ms; --ease:cubic-bezier(.2,.8,.2,1.05);
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme:dark){
+  /* oxblood 8F2739 on 14161A is about 2:1 and fails; D9647A is about 5:1. The sheet
+     keeps its own darker ink because it stays light. */
+  :root{ --desk:#14161A; --paper:#E8EAED; --wash:rgba(122,31,46,.16);
+         --mark-desk:#D9647A; --muted-desk:#A3AAB4; --ink-desk:#E8EAED; }
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--desk);color:var(--ink-desk);font:16px/1.45 var(--ui)}
+button{font:inherit;cursor:pointer}
+.num{font-variant-numeric:tabular-nums}
+
+/* --- top -------------------------------------------------------------------------- */
+.top{display:flex;align-items:baseline;gap:20px;padding:14px 28px 6px;color:var(--ink-desk)}
+.top h1{margin:0;font:700 30px/1 var(--hand);color:var(--mark-desk);letter-spacing:.2px}
+.top .sub{color:var(--muted-desk);font-size:14px}
+.top .spacer{flex:1}
+.top .ctl{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--muted-desk)}
+.btn{border:1.5px solid var(--ink-desk);background:transparent;color:var(--ink-desk);padding:7px 14px;border-radius:2px;font-weight:700}
+.btn.primary{background:#7A1F2E;border-color:#7A1F2E;color:#fff}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.ghost{border-color:var(--rule);color:var(--muted-desk);font-weight:400;padding:5px 10px}
+
+/* --- stage line ------------------------------------------------------------------- */
+.stage{padding:0 28px 10px;font:400 15px var(--hand);color:var(--mark-desk);min-height:22px}
+.stage .t{color:var(--muted-desk);font-family:var(--ui);font-size:13px;margin-left:10px}
+
+/* --- desk layout ------------------------------------------------------------------ */
+.desk{display:grid;grid-template-columns:minmax(0,62fr) minmax(280px,38fr);gap:26px;padding:0 28px 40px;align-items:start}
+.sheet{position:relative;background:var(--paper);color:#1C1F24;box-shadow:0 1px 2px rgba(0,0,0,.08),0 10px 28px rgba(0,0,0,.07);padding:40px 44px 36px;border-radius:0;min-height:520px}
+.sheet + .sheet{margin-top:26px}
+.sheet textarea{width:100%;min-height:480px;border:0;background:transparent;resize:vertical;font:14px/1.5 var(--letter);color:#1C1F24;outline:none}
+.sheet .letter{white-space:pre-wrap;font:14px/1.5 var(--letter);color:#1C1F24}
+.sheet .overlay{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.sheet .label{position:absolute;top:12px;right:16px;font:400 12px var(--hand);color:var(--muted)}
+
+/* marks inside the letter text */
+.mk{position:relative}
+.mk.wash{background:linear-gradient(transparent 12%, var(--wash) 12%, var(--wash) 88%, transparent 88%)}
+
+/* --- margin ----------------------------------------------------------------------- */
+.margin{position:relative;min-height:520px;padding-top:6px}
+.note{position:relative;font:400 17px/1.35 var(--hand);color:var(--mark-desk);margin:0 0 22px;padding-left:6px;opacity:0;transform:translateY(5px);transition:opacity 400ms ease,transform 400ms var(--ease)}
+.note.in{opacity:1;transform:none}
+.note b{font-weight:700}
+.note .big{font-size:34px;line-height:1.05;display:block;margin:2px 0 4px}
+.note .huge{font-size:38px;line-height:1;display:block;margin:2px 0 6px}
+.note .small{font:400 12.5px/1.4 var(--ui);color:var(--muted-desk);display:block;margin-top:4px}
+.note .cite{font:400 12px/1.4 var(--ui);color:var(--muted-desk);display:block;margin-top:6px}
+.note .q{display:block;font:400 14.5px/1.35 var(--hand);color:var(--mark-desk);margin:6px 0 0 10px;border-left:2px solid var(--mark-desk);padding-left:8px;opacity:.9}
+.note .q + .q{margin-top:8px}
+@media (prefers-reduced-motion:reduce){ .note{transition:none} }
+
+/* --- appeal sheet ----------------------------------------------------------------- */
+.appeal{display:none}
+.appeal.on{display:block}
+.appeal .draft{white-space:pre-wrap;font:14px/1.55 var(--letter);color:#1C1F24;min-height:80px}
+.appeal .draft .cursor{display:inline-block;width:7px;height:15px;background:var(--mark);vertical-align:-2px;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* signature gate */
+.gate{margin-top:34px;padding-top:10px;display:none}
+.gate.on{display:block}
+.gate .line{position:relative;height:56px}
+.gate .line svg{position:absolute;left:0;bottom:6px;width:100%;height:40px;overflow:visible}
+.gate .x{position:absolute;left:0;bottom:10px;font:700 26px var(--hand);color:var(--mark)}
+.gate .hint{font:400 16px var(--hand);color:var(--mark);margin:6px 0 12px}
+.gate .actions{display:flex;gap:10px;align-items:center;font-family:var(--ui)}
+.gate .actions .why{font-size:13px;color:var(--muted);margin-left:8px}
+/* the gate sits on the sheet, which stays paper in every theme, so its controls take
+   the sheet's ink rather than the desk's */
+.gate .btn{border-color:var(--ink);color:var(--ink)}
+.gate .btn.primary{color:#fff}
+.stamp{position:absolute;right:38px;bottom:34px;font:700 28px/1 var(--hand);color:var(--mark);border:2.5px solid var(--mark);padding:6px 12px;transform:rotate(-7deg);opacity:0;transition:opacity 250ms}
+.stamp.on{opacity:.92}
+.stamp.no{color:var(--muted);border-color:var(--muted)}
+
+/* --- footer note -------------------------------------------------------------------- */
+.foot{padding:0 28px 28px;font-size:12.5px;color:var(--muted-desk)}
+.foot a{color:inherit}
+.err{padding:0 28px 16px;color:var(--mark-desk);font-family:var(--hand)}
+
+@media (max-width:900px){ .desk{grid-template-columns:1fr} .margin{min-height:0} }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>Day Thirty</h1>
+  <div class="sub">An insurance denial, worked end to end. It stops before anything is filed.</div>
+  <div class="spacer"></div>
+  <div class="ctl">
+    <span>A real published denial</span>
+    <button class="btn ghost" id="prev" title="previous case">←</button>
+    <span class="num" id="caseNo">1</span>
+    <button class="btn ghost" id="next" title="next case">→</button>
+    <button class="btn primary" id="run">Work this denial</button>
+  </div>
+</div>
+<div class="stage" id="stage"></div>
+<div class="err" id="err"></div>
+
+<div class="desk">
+  <div>
+    <div class="sheet" id="sheet">
+      <div class="label">the plan's letter</div>
+      <textarea id="ta" spellcheck="false"></textarea>
+      <div class="letter" id="letter" hidden></div>
+      <svg class="overlay" id="ov">
+        <defs>
+          <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7" result="n"/>
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="1.6" xChannelSelector="R" yChannelSelector="G"/>
+          </filter>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="sheet appeal" id="appeal">
+      <div class="label">the appeal, drafted</div>
+      <div class="draft" id="draft"></div>
+      <div class="gate" id="gate">
+        <div class="hint">Nothing has been filed. Read it. Then sign it, or don't.</div>
+        <div class="line">
+          <span class="x">✕</span>
+          <svg viewBox="0 0 600 40" preserveAspectRatio="none"><path id="sigline" d="M0 30 C 120 26, 240 34, 360 29 S 560 31, 600 28" fill="none" stroke="#1C1F24" stroke-width="1.2" filter="url(#rough)"/></svg>
+        </div>
+        <div class="actions">
+          <button class="btn primary" id="sign">Sign and file</button>
+          <button class="btn" id="decline">Don't file</button>
+          <span class="why" id="gateWhy"></span>
+        </div>
+      </div>
+      <div class="stamp" id="stamp"></div>
+    </div>
+  </div>
+
+  <div class="margin" id="margin"></div>
+</div>
+
+<div class="foot">
+  Every case here is a real denial from California's published Independent Medical Review record. The clinical facts are the state's; the letterhead is not.
+  Not legal advice. <a href="https://github.com/JonathanSolvesProblems/daythirty">Source and measurements</a>.
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const ov = $('#ov'), sheet = $('#sheet'), letterEl = $('#letter'), ta = $('#ta'), margin = $('#margin');
+let caseIdx = 0, current = null, runId = null, es = null, draftText = '';
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- case loading ---------- */
+async function loadCase(i){
+  const r = await fetch('/api/case?i=' + i); const c = await r.json();
+  current = c; caseIdx = c.index; $('#caseNo').textContent = c.index + 1;
+  ta.value = c.letter; ta.hidden = false; letterEl.hidden = true;
+  clearMarks(); margin.innerHTML = ''; $('#stage').textContent = '';
+  $('#appeal').classList.remove('on'); $('#gate').classList.remove('on');
+  $('#draft').textContent = ''; $('#stamp').className = 'stamp'; $('#err').textContent='';
+}
+$('#prev').onclick = () => loadCase(caseIdx - 1 < 0 ? 0 : caseIdx - 1);
+$('#next').onclick = () => loadCase(caseIdx + 1);
+
+/* ---------- marks ---------- */
+function clearMarks(){ [...ov.querySelectorAll('path,ellipse,line')].forEach(n => n.remove()); }
+function rectOf(el){ const a = el.getBoundingClientRect(), b = sheet.getBoundingClientRect(); return {x:a.left-b.left, y:a.top-b.top, w:a.width, h:a.height}; }
+function drawPath(d, opts={}){
+  const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+  p.setAttribute('d', d); p.setAttribute('fill','none');
+  p.setAttribute('stroke', opts.stroke || 'var(--mark)'); p.setAttribute('stroke-width', opts.w || 2.2);
+  p.setAttribute('stroke-linecap','round'); p.setAttribute('stroke-linejoin','round');
+  p.setAttribute('filter','url(#rough)');
+  ov.appendChild(p);
+  if(!reduced){
+    const L = p.getTotalLength();
+    p.style.strokeDasharray = L; p.style.strokeDashoffset = L;
+    p.style.transition = `stroke-dashoffset ${opts.ms || 700}ms cubic-bezier(.2,.8,.2,1.05)`;
+    requestAnimationFrame(() => requestAnimationFrame(() => { p.style.strokeDashoffset = 0; }));
+  }
+  return p;
+}
+/* an ellipse drawn by hand: goes around a bit more than once, slightly off-axis */
+function circle(el, ms){
+  const r = rectOf(el); const cx = r.x + r.w/2, cy = r.y + r.h/2, rx = r.w/2 + 9, ry = r.h/2 + 6;
+  const pts = []; const start = -0.9, end = start + Math.PI*2.35;
+  for(let t=start; t<=end; t+=0.18){ const j = (Math.sin(t*3.7)*1.4); pts.push([cx + (rx+j)*Math.cos(t), cy + (ry+j*0.6)*Math.sin(t) + (t-start)*0.35]); }
+  const d = 'M' + pts.map(p => p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L');
+  return drawPath(d, {ms: ms || 700});
+}
+function underline(el, ms){
+  const r = rectOf(el); const y = r.y + r.h - 1;
+  const d = `M${r.x-2} ${y+1} C ${r.x + r.w*0.3} ${y+3}, ${r.x + r.w*0.6} ${y-1}, ${r.x + r.w + 3} ${y+2}`;
+  return drawPath(d, {ms: ms || 450, w: 2});
+}
+function wash(el){ el.classList.add('wash'); }
+function arrowToMargin(el, ms){
+  const r = rectOf(el); const sx = r.x + r.w + 8, sy = r.y + r.h/2;
+  const ex = sheet.clientWidth + 18, ey = sy - 2;
+  const d = `M${sx} ${sy} C ${sx+40} ${sy-6}, ${ex-40} ${ey+4}, ${ex} ${ey} M${ex-9} ${ey-6} L${ex} ${ey} L${ex-9} ${ey+5}`;
+  return drawPath(d, {ms: ms || 600, w: 2});
+}
+
+/* wrap the first occurrence of `text` in the letter with a span */
+function markText(text, cls){
+  if(!text) return null;
+  const html = letterEl.innerHTML;
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const needle = esc(text);
+  const i = html.indexOf(needle);
+  if(i < 0){ // try case-insensitive
+    const j = html.toLowerCase().indexOf(needle.toLowerCase()); if(j<0) return null;
+    letterEl.innerHTML = html.slice(0,j) + `<span class="mk ${cls}">` + html.slice(j, j+needle.length) + '</span>' + html.slice(j+needle.length);
+  } else {
+    letterEl.innerHTML = html.slice(0,i) + `<span class="mk ${cls}">` + needle + '</span>' + html.slice(i+needle.length);
+  }
+  return letterEl.querySelector('.mk.'+cls);
+}
+
+/* margin notes. `order` is the narrative order (read, clock, precedent, stop), which
+   is not the arrival order: the model calls the deadline and precedent tools in
+   parallel and precedent usually returns first. An anchored note also has a minimum
+   y, so the deadline sits level with the date it is drawn from. */
+function note(html, anchor, order){
+  const n = document.createElement('div'); n.className = 'note'; n.innerHTML = html;
+  n.dataset.order = order || 9;
+  if(anchor){ const r = rectOf(anchor); n.dataset.top = Math.max(0, r.y - 6); }
+  margin.appendChild(n);
+  layoutNotes();
+  requestAnimationFrame(() => n.classList.add('in'));
+  return n;
+}
+function layoutNotes(){
+  let y = 0;
+  const notes = [...margin.querySelectorAll('.note')].sort((a,b) => (+a.dataset.order) - (+b.dataset.order));
+  notes.forEach(n => {
+    const want = n.dataset.top ? parseFloat(n.dataset.top) : y;
+    const top = Math.max(want, y);
+    n.style.position = 'absolute'; n.style.top = top + 'px'; n.style.left = '0'; n.style.right = '0';
+    y = top + n.offsetHeight + 18;
+  });
+  margin.style.minHeight = Math.max(520, y) + 'px';
+}
+window.addEventListener('resize', () => { layoutNotes(); });
+
+function fmtDate(iso){ if(!iso) return ''; const d = new Date(iso+'T00:00:00'); return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}); }
+function pct(x){ return (x*100).toFixed(1).replace(/\.0$/,'') + '%'; }
+
+/* ---------- the run ---------- */
+$('#run').onclick = async () => {
+  if(!current) return;
+  $('#run').disabled = true; $('#err').textContent = '';
+  letterEl.textContent = ta.value; letterEl.hidden = false; ta.hidden = true;
+  clearMarks(); margin.innerHTML = ''; draftText = '';
+  $('#appeal').classList.remove('on'); $('#gate').classList.remove('on'); $('#stamp').className='stamp';
+  const t0 = performance.now();
+
+  const r = await fetch('/api/run', {method:'POST', headers:{'content-type':'application/json'},
+    body: JSON.stringify({letter: ta.value, grievance_filed: current.grievance_filed, age: current.age, gender: current.gender})});
+  runId = (await r.json()).run_id;
+
+  es = new EventSource(`/api/run/${runId}/events`);
+  let intake = null, deadlineNote = null;
+  es.onmessage = ev => {
+    const e = JSON.parse(ev.data);
+    const secs = ((performance.now()-t0)/1000).toFixed(1);
+
+    if(e.type === 'stage'){
+      $('#stage').innerHTML = e.label + `<span class="t num">${secs}s</span>`;
+    }
+    else if(e.type === 'intake'){
+      intake = e;
+      // Each markText rewrites the letter's innerHTML, which detaches the spans the
+      // earlier calls returned. Wrap everything first, then re-query, or the detached
+      // nodes measure as zero-size rects and the circles draw at the page origin.
+      markText(e.condition, 'cond'); markText(e.treatment, 'tx'); markText('DETERMINATION: DENIED', 'den');
+      const cond = letterEl.querySelector('.mk.cond'), tx = letterEl.querySelector('.mk.tx'), den = letterEl.querySelector('.mk.den');
+      if(cond) circle(cond, 600); if(tx) setTimeout(()=>circle(tx, 600), 250); if(den) setTimeout(()=>underline(den), 500);
+      note(`Read it.<br><b>${e.condition}</b>, denied <b>${e.treatment}</b>.<br>Their reason: <b>${e.grounds}</b>.`
+         + `<span class="small">Amazon Nova read the letter. California's category: ${e.diagnosis_category} / ${e.treatment_category}.</span>`, null, 1);
+    }
+    else if(e.type === 'tool' && e.name === 'compute_filing_deadline'){
+      const d = e.result || {};
+      const dateEl = markText(current.denial_date, 'date');
+      if(dateEl){ circle(dateEl, 700); setTimeout(()=>arrowToMargin(dateEl, 600), 500); }
+      const days = d.days_remaining_from_today;
+      deadlineNote = note(
+        `Not from this date.<br>` +
+        `Grievance filed <b>${fmtDate(current.grievance_filed)}</b>.<br>` +
+        `<b>Day 30</b> → the clock starts <b>${fmtDate(d.qualifying_event)}</b>, whether they answer or not.<br>` +
+        `+ six months →` +
+        `<span class="huge num">${fmtDate(d.deadline)}</span>` +
+        `<b class="num">${days} days</b> left.` +
+        `<span class="cite">${(d.statutory_reasoning||[]).join(' · ')}</span>` +
+        (d.caveats && d.caveats.length ? `<span class="small">${d.caveats.join(' ')}</span>` : ''),
+        dateEl, 2);
+    }
+    else if(e.type === 'tool' && e.name === 'find_precedent'){
+      const p = e.result || {};
+      const rate = p.published_overturn_rate;
+      const exs = (p.exemplars||[]).slice(0,2).map(x => `<span class="q">${(x.reviewer_reasoning||'').slice(0,190).replace(/\s+\S*$/,'')}…</span>`).join('');
+      note(
+        (rate == null ? `<b>No published rate.</b> Too few comparable decisions.` :
+          `<span class="big num">${pct(rate)}</span>overturned. <b class="num">${p.cohort_overturned.toLocaleString()} of ${p.cohort_size.toLocaleString()}</b> published California decisions.` +
+          `<span class="small">${p.rate_describes||''}</span>`) +
+        (exs ? `<br>What persuaded the reviewers:${exs}` : `<span class="small">${(p.notes||[]).join(' ')}</span>`),
+        null, 3);
+    }
+    else if(e.type === 'text'){
+      $('#appeal').classList.add('on');
+      draftText += e.delta;
+      $('#draft').innerHTML = escapeHtml(draftText.replace(/\*\*/g, '')) + '<span class="cursor"></span>';
+      layoutNotes();
+    }
+    else if(e.type === 'gate'){
+      $('#appeal').classList.add('on');
+      $('#draft').textContent = (e.letter || draftText).replace(/\*\*/g, '');
+      $('#gate').classList.add('on');
+      $('#gateWhy').textContent = `Drafted in ${e.seconds}s. Deadline ${fmtDate(e.deadline)}.`;
+      $('#stage').innerHTML = `Stopped. Waiting for you.<span class="t num">${e.seconds}s</span>`;
+      note(`Stopped here.<br>It will not send this without you.`, null, 4);
+      $('#gate').scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block:'center'});
+    }
+    else if(e.type === 'done'){
+      es.close(); $('#run').disabled = false;
+      const st = $('#stamp');
+      if(e.filed){ st.textContent = 'FILED'; st.className = 'stamp on'; $('#stage').textContent = 'Filed.'; }
+      else { st.textContent = 'NOT FILED'; st.className = 'stamp no on'; $('#stage').textContent = 'Not filed. Nothing left your hands.'; }
+      $('#sign').disabled = true; $('#decline').disabled = true;
+    }
+    else if(e.type === 'error'){
+      es.close(); $('#run').disabled = false; $('#err').textContent = e.message;
+    }
+  };
+};
+
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function decide(approved){
+  $('#sign').disabled = true; $('#decline').disabled = true;
+  if(approved){ const p = $('#sigline'); p.style.stroke = 'var(--mark)'; p.style.strokeWidth = '2.4'; }
+  await fetch(`/api/run/${runId}/decide`, {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({approved})});
+}
+$('#sign').onclick = () => decide(true);
+$('#decline').onclick = () => decide(false);
+
+loadCase(0);
+</script>
+</body>
+</html>

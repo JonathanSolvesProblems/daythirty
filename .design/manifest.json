@@ -1,0 +1,71 @@
+{
+  "project": "daythirty",
+  "date": "2026-09-12",
+  "platform": "web-app",
+  "family": "organic-soft",
+  "metaphor": "the redline: an insurer's typeset denial letter marked up by hand in a litigator's ink by someone on the patient's side; the gate is a signature line",
+  "category_convention_avoided": "insurtech/legal-tech SaaS: white or navy, blue accent, progress stepper, rounded cards, chat bubble; health adds calming teal",
+  "design_code": [
+    "Marks are drawn and animate on, because a person is marking this up, not a pipeline.",
+    "The letter is set in the insurer's own boring type, because it is theirs and should look like it.",
+    "UI chrome is Atkinson Hyperlegible, because it was designed for low-vision readers and the person reading this is sick.",
+    "The canvas is paper, because a dark default would misrepresent the material; the ledger's last seven entries are dark, so light is the anti-convergent choice."
+  ],
+  "anti_brief": ["no stepper", "no cards", "no blue"],
+  "expressive_axis": "the marks: hand-drawn oxblood ink, animated on, everything else quiet",
+  "register": "grave, on the patient's side",
+  "canvas": {
+    "default_theme": "light",
+    "override_reason": "The artifact is a paper letter and the work is ink on it. Dark would lie about the material. Seven consecutive dark entries in the ledger make light the differentiating choice now.",
+    "light": {
+      "desk": "#DDE1E6",
+      "paper": "#F3F5F7",
+      "letter_ink": "#1C1F24",
+      "letter_muted": "#5C636E",
+      "rule": "#C9CED6",
+      "mark": "#7A1F2E",
+      "mark_wash": "rgba(122,31,46,0.14)",
+      "mark_hue_deg": 352
+    },
+    "dark": {
+      "desk": "#14161A",
+      "paper": "#E8EAED",
+      "letter_ink": "#1C1F24",
+      "letter_muted": "#5C636E",
+      "rule": "#C9CED6",
+      "mark": "#8F2739",
+      "mark_wash": "rgba(143,39,57,0.16)",
+      "note": "At night the room is dark and the paper is still paper. Only the desk changes; contrast on the sheet is verified separately."
+    }
+  },
+  "type": {
+    "voice": "a typed form letter, marked up by a steady hand",
+    "letter": "Arial, Helvetica, sans-serif",
+    "hand": "Kalam",
+    "ui": "Atkinson Hyperlegible",
+    "figures": "tabular-nums",
+    "scale_ratio": 1.25,
+    "base_px": 16
+  },
+  "structure": "sheet-with-margin: letter column left, annotation margin right, second sheet below for the appeal, signature line as the gate",
+  "edge_depth": {
+    "sheet_radius": 0,
+    "control_radius": 2,
+    "sheet_shadow": "0 1px 2px rgba(0,0,0,.08), 0 10px 28px rgba(0,0,0,.07)",
+    "marks": "SVG strokes with slight roughness, no blur"
+  },
+  "motion": {
+    "explains": "that a person is working through the letter in order",
+    "signature": "the deadline date is circled, then an arrow is drawn to the margin where day 30 and the six-month count are written by hand",
+    "draw_ms": 700,
+    "draw_easing": "cubic-bezier(.2,.8,.2,1.05)",
+    "note_ms": 400,
+    "rest": "static",
+    "reduced_motion": "marks appear instantly, no draw"
+  },
+  "headline_numbers": [
+    "the statutory deadline, circled, with the count from day 30 written beside it",
+    "the published overturn rate for this cohort, with its scope in words and the count behind it",
+    "days remaining"
+  ]
+}
