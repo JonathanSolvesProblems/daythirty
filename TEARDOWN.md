@@ -28,10 +28,11 @@ one afterwards from the console or CLI rather than trusting the tool's summary:
 - IAM role `AmazonBedrockAgentCoreSDKRuntime-us-east-1-e4277ba907`
 - IAM role `AmazonBedrockAgentCoreSDKCodeBuild-us-east-1-e4277ba907`
 - CloudWatch log group `/aws/bedrock-agentcore/runtimes/daythirty-SGLNmB3qzW-DEFAULT`
-- AgentCore Memory: the toolkit's configure step said it would create short-term
-  memory, but the config records `memory_id: null`, so check
-  `aws bedrock-agentcore-control list-memories --region us-east-1` and delete anything
-  named for daythirty.
+- AgentCore Memory `daythirty_mem-UDogCd80Ml`
+  `arn:aws:bedrock-agentcore:us-east-1:533354334997:memory/daythirty_mem-UDogCd80Ml`
+  The redeploy on 2026-09-12 created it (the first deploy recorded `memory_id: null`).
+  Delete it, then confirm with
+  `aws bedrock-agentcore-control list-memories --region us-east-1`.
 
 Then sweep every region for orphans, and delete the user's single access key (created
 2026-08-11; `aws iam list-access-keys --user-name unsay-bedrock` shows it) if the account

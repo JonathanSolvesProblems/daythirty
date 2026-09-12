@@ -69,6 +69,7 @@ Under `Cal. Health & Safety Code § 1374.30(j)(3)`, an enrollee "shall not be re
 participate in the plan's grievance process for more than 30 days." So thirty days after
 the grievance is filed, whether or not the plan has answered, the qualifying event occurs
 and `§ 1374.30(k)` starts a **six month** clock.
+([California Legislature, HSC § 1374.30](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=HSC&sectionNum=1374.30.))
 
 Counting six months from the plan's eventual answer therefore puts the deadline roughly
 `(response time − 30)` days too late. If the plan takes four months to say no, someone

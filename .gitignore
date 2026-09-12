@@ -36,7 +36,12 @@ outbox/
 # Demo video working files. The narration recording and captured clips are large
 # and belong on the video host, not in the repo.
 broll/
+_videos/
 *.mp4
+*.webm
 *.mov
 *.wav
 *.m4a
+*.mp3
+*.edit-plan.json
+demo.mp4

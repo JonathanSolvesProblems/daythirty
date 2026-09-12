@@ -32,18 +32,18 @@ agents:
     bedrock_agentcore:
       agent_id: daythirty-SGLNmB3qzW
       agent_arn: arn:aws:bedrock-agentcore:us-east-1:533354334997:runtime/daythirty-SGLNmB3qzW
-      agent_session_id: e139f8bd-9be7-405b-ad39-cccc3134ae06
+      agent_session_id: null
     codebuild:
       project_name: bedrock-agentcore-daythirty-builder
       execution_role: arn:aws:iam::533354334997:role/AmazonBedrockAgentCoreSDKCodeBuild-us-east-1-e4277ba907
       source_bucket: bedrock-agentcore-codebuild-sources-533354334997-us-east-1
     memory:
       mode: STM_ONLY
-      memory_id: null
-      memory_arn: null
-      memory_name: daythirty_memory
+      memory_id: daythirty_mem-UDogCd80Ml
+      memory_arn: arn:aws:bedrock-agentcore:us-east-1:533354334997:memory/daythirty_mem-UDogCd80Ml
+      memory_name: daythirty_mem
       event_expiry_days: 30
-      first_invoke_memory_check_done: false
+      first_invoke_memory_check_done: true
       was_created_by_toolkit: false
     identity:
       credential_providers: []

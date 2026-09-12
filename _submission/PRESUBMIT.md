@@ -23,7 +23,7 @@ Deadline: 2026-09-14, 5:00pm PDT.
 | Public repo, MIT or Apache | https://github.com/JonathanSolvesProblems/daythirty, `LICENSE` is MIT |
 | README | `README.md` at the repo root |
 | Architecture diagram | `_submission/architecture.png`, and the mermaid source in `README.md` |
-| Demo video, 5 minutes max, working project end to end | **NOT YET RECORDED.** Narration in `DEMO_SCRIPT.md`, about 95 seconds. |
+| Demo video, 5 minutes max, working project end to end | **RENDERED 2026-09-12**, `broll/demo.mp4`, 1:59, 1920x1080, 48 kHz, -16.7 LUFS. Not yet uploaded; add the URL to `_submission/devpost.md` once it is. Every spoken number carries a `Source:` lower third (KFF 2024, Cal. HSC 1374.30, DMHC dataset), verified against the fetched page and listed in `broll/_sources.json`. |
 | AWS Builder ID | `jon.knight.andrei@gmail.com`, confirmed on the Builder ID profile page |
 | Optional: live demo link | Not public. The web UI runs locally; the AgentCore runtime requires IAM to invoke. |
 | Optional: builder.aws publication (up to +0.6) | `_submission/blog.md`, not yet published |
@@ -37,7 +37,8 @@ to file.
 
 ## What only Jonathan can do
 
-1. Record the narration from `DEMO_SCRIPT.md` (about 95 seconds) and hand over the audio.
+1. Upload `broll/demo.mp4` (YouTube or Vimeo, public or unlisted) and paste the URL into
+   the Video block of `_submission/devpost.md`.
 2. Submit at https://agentsforhumans.devpost.com/ using `_submission/devpost.md`.
 3. Publish `_submission/blog.md` at https://builder.aws.com/ and add the URL to the form.
 4. After submitting, run check 3 and check 5: open the live project page logged out.

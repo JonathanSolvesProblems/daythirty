@@ -1,0 +1,58 @@
+{
+  "project_name": "Day Thirty",
+  "app_type": "web",
+  "start_url": "http://127.0.0.1:8030/",
+  "browser": {"color_scheme": "light"},
+  "shots": [
+    {
+      "id": "01_kff_denials",
+      "label": "Source: KFF, 2024 marketplace data",
+      "description": "The KFF article the opening numbers come from, scrolled live to the 85 million denied and the under 1% appealed paragraphs. Real page, real numbers, on screen while they are spoken.",
+      "capture_type": "web_screencast",
+      "effect": "none",
+      "duration": 3,
+      "actions": [
+        {"type": "navigate", "url": "https://www.kff.org/patient-consumer-protections/claims-denials-and-appeals-in-aca-marketplace-plans-in-2024/"},
+        {"type": "wait", "seconds": 2},
+        {"type": "evaluate", "script": "(() => { const el = [...document.querySelectorAll('p')].find(p => /approximately 85 million/i.test(p.textContent)); if (el) { window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 220, behavior: 'smooth'}); } })()", "settle": 5},
+        {"type": "evaluate", "script": "(() => { const el = [...document.querySelectorAll('p')].find(p => /262,982/.test(p.textContent)); if (el) { window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 220, behavior: 'smooth'}); } })()", "settle": 7}
+      ]
+    },
+    {
+      "id": "02_full_run",
+      "label": "Working the denial",
+      "description": "One long take: the denial letter on the page, Run is clicked, the letter gets marked up by hand (intake circles, the Day 30 deadline note, the precedent note with the published overturn rate), the appeal streams in, the run stops at the signature line, a person signs, the APPROVED stamp and the ready-to-file note with the due date and DMHC channels appear. Seek into it per beat with in_point.",
+      "capture_type": "web_screencast",
+      "effect": "none",
+      "duration": 3,
+      "actions": [
+        {"type": "navigate", "url": "http://127.0.0.1:8030/"},
+        {"type": "evaluate", "script": "new Promise(r => { const t = setInterval(() => { const ta = document.querySelector('#ta'); if (ta && ta.value.length > 100) { clearInterval(t); r(true); } }, 200); })", "settle": 3},
+        {"type": "click", "selector": "#run"},
+        {"type": "evaluate", "script": "new Promise(r => { const t = setInterval(() => { if (document.querySelector('#gate.on')) { clearInterval(t); r(true); } }, 250); })", "settle": 6},
+        {"type": "click", "selector": "#sign"},
+        {"type": "evaluate", "script": "new Promise(r => { const t = setInterval(() => { if (document.querySelector('#stamp.on')) { clearInterval(t); r(true); } }, 250); })", "settle": 8}
+      ]
+    },
+    {
+      "id": "03_precedent_scroll",
+      "label": "Source: California DMHC, 42,749 published decisions",
+      "description": "The finished run, scrolled slowly from the top of the marked-up letter down the margin: the deadline note, then the precedent note with the published overturn rate and what persuaded the reviewers, then the drafted appeal. Slow camera motion over a real completed state.",
+      "capture_type": "web_screencast",
+      "effect": "none",
+      "duration": 3,
+      "actions": [
+        {"type": "navigate", "url": "http://127.0.0.1:8030/"},
+        {"type": "evaluate", "script": "new Promise(r => { const t = setInterval(() => { const ta = document.querySelector('#ta'); if (ta && ta.value.length > 100) { clearInterval(t); r(true); } }, 200); })", "settle": 1},
+        {"type": "click", "selector": "#run"},
+        {"type": "evaluate", "script": "new Promise(r => { const t = setInterval(() => { if (document.querySelector('#gate.on')) { clearInterval(t); r(true); } }, 250); })", "settle": 1},
+        {"type": "evaluate", "script": "window.scrollTo({top: 0, behavior: 'auto'})", "settle": 2},
+        {"type": "evaluate", "script": "window.scrollTo({top: 260, behavior: 'smooth'})", "settle": 5},
+        {"type": "evaluate", "script": "window.scrollTo({top: 520, behavior: 'smooth'})", "settle": 5},
+        {"type": "evaluate", "script": "window.scrollTo({top: 820, behavior: 'smooth'})", "settle": 5},
+        {"type": "evaluate", "script": "window.scrollTo({top: 1180, behavior: 'smooth'})", "settle": 5},
+        {"type": "evaluate", "script": "window.scrollTo({top: 1560, behavior: 'smooth'})", "settle": 6}
+      ]
+    }
+  ]
+}
