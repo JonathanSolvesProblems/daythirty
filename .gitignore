@@ -28,3 +28,11 @@ dist/
 # Local scratch
 scratch/
 *.log
+
+# Demo video working files. The narration recording and captured clips are large
+# and belong on the video host, not in the repo.
+broll/
+*.mp4
+*.mov
+*.wav
+*.m4a
