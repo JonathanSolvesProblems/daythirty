@@ -10,6 +10,9 @@ started.
 
 Built with the Strands Agents SDK for the AWS Agents for Humans Hackathon.
 
+**Demo video (2 min):** https://www.youtube.com/watch?v=cKe6B5hYq5s
+**Write-up:** https://jonathanandrei.com/blog/day-thirty-california-insurance-appeal-agent/
+
 > Not legal advice. This computes dates and drafts a document. It does not tell anyone
 > what to do, and it does not practise law.
 

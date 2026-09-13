@@ -114,8 +114,9 @@ The astronomical holidays in Gov. Code § 6700 (Lunar New Year, Diwali) are supp
 
 ## Video
 
-Not yet recorded. When the URL exists, add it here as a fenced block like the others.
-Until then there is deliberately no block, so nothing non-final can be pasted by mistake.
+```
+https://www.youtube.com/watch?v=cKe6B5hYq5s
+```
 
 ## Architecture diagram (file upload)
 
