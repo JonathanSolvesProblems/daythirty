@@ -63,8 +63,27 @@ It does not predict whether you will win. That was the original plan and it was 
 
 Two holidays in Gov. Code § 6700 are defined astronomically (Lunar New Year, Diwali) and are supplied as data with empty tables; every result says so. California only. Not legal advice.
 
+## Running it on Amazon Bedrock AgentCore
+
+The same agent is deployed on Amazon Bedrock AgentCore Runtime, built as an ARM64 container by CodeBuild, so it works in the background rather than on a laptop. Invoked with a real published GERD denial, the runtime returns in about 14 seconds with the intake, the statutory deadline and a drafted appeal stopped at the gate, and its response says in words that nothing has been filed. Locally, the web surface is one page: the insurer's typeset letter, marked up by hand in a litigator's ink as each tool returns, with a signature line for the gate, because you sign an appeal to file it.
+
+## Try it
+
+```
+git clone https://github.com/JonathanSolvesProblems/daythirty
+cd daythirty
+python -m venv .venv && .venv/Scripts/pip install -r requirements.txt
+pytest                              # 20 tests, no AWS needed
+python scripts/fetch_corpus.py      # 85 MB from California's open data portal
+python eval/build_split.py
+python scripts/build_taxonomy.py
+.venv/Scripts/uvicorn app:app --port 8030
+```
+
+Open http://127.0.0.1:8030, click "Work this denial", and sign it or don't. It needs AWS credentials with Bedrock access in us-east-1 (Claude Haiku 4.5 and Amazon Nova Lite through the us.* inference profiles). A run takes 15 to 35 seconds and costs about a cent.
+
 Demo video (2 min): https://www.youtube.com/watch?v=cKe6B5hYq5s
 
 Code, evaluation reports and honest limitations: https://github.com/JonathanSolvesProblems/daythirty
 
-Also deployed on Amazon Bedrock AgentCore Runtime; the README records a real invocation with its timing. Built for the AWS Agents for Humans hackathon, Everyday Agents track.
+Built for the AWS Agents for Humans hackathon, Everyday Agents track.
