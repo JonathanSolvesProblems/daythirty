@@ -27,7 +27,7 @@ https://github.com/JonathanSolvesProblems/daythirty
 ## Built with
 
 ```
-strands-agents, amazon-bedrock, amazon-nova, claude-haiku-4-5, python, boto3, pytest
+strands-agents, amazon-bedrock, amazon-bedrock-agentcore, amazon-nova, claude-haiku-4-5, python, boto3, fastapi, uvicorn, server-sent-events, javascript, html, css, svg, docker, aws-codebuild, amazon-ecr, amazon-cloudwatch, pytest, playwright, california-dmhc-open-data
 ```
 
 ## About the project
@@ -117,10 +117,44 @@ The astronomical holidays in Gov. Code § 6700 (Lunar New Year, Diwali) are supp
 Not yet recorded. When the URL exists, add it here as a fenced block like the others.
 Until then there is deliberately no block, so nothing non-final can be pasted by mistake.
 
+## Architecture diagram (file upload)
+
+```
+_submission/architecture.png
+```
+
 ## AWS Builder ID
 
 ```
 jon.knight.andrei@gmail.com
+```
+
+## URL to your live demo link (optional)
+
+Left blank. The web surface runs locally against the judge's own AWS credentials, and the AgentCore runtime needs IAM in my account. See the notes below if a public deployment is stood up before the deadline.
+
+## Testing instructions
+
+```
+Requirements: Python 3.11 or newer, and AWS credentials with Amazon Bedrock access in us-east-1 (Claude Haiku 4.5 and Amazon Nova Lite through the us.* inference profiles).
+
+git clone https://github.com/JonathanSolvesProblems/daythirty
+cd daythirty
+python -m venv .venv
+.venv/Scripts/pip install -r requirements.txt      (macOS/Linux: .venv/bin/pip)
+pytest                                  20 tests: statute engine, precedent, claims check. No AWS needed.
+python scripts/fetch_corpus.py          85 MB from California DMHC's open data portal
+python eval/build_split.py              temporal, leak-controlled split
+python scripts/build_taxonomy.py        the state's own category filings
+.venv/Scripts/uvicorn app:app --port 8030
+
+Open http://127.0.0.1:8030. A real published denial is loaded; the arrows pick another. Click "Work this denial" and watch the letter get marked up: the intake, the statutory deadline with its provisions, the published overturn rate for this kind of denial and what persuaded the reviewers, then the drafted appeal. The run stops at the signature line. "Sign it" stamps APPROVED, writes the application package to outbox/ and shows the due date and DMHC's filing channels. "Don't sign" and nothing leaves. A run takes 15 to 35 seconds and costs about a cent in Bedrock usage.
+
+The same run in a terminal: python run_agent.py (asks for approval) or python run_agent.py --approve.
+
+Measurements: python eval/check_claims.py verifies every number in the README against the reports in eval/. Each report can be regenerated (eval/intake_accuracy.py, eval/grounding.py, eval/precedent_coverage.py, eval/ablation.py); each makes Bedrock calls.
+
+AgentCore: the deployed runtime is invokable only with IAM in my account, so it is not public. scripts/invoke_agentcore.py shows the call, and the README records a real invocation with its timing.
 ```
 
 ---
