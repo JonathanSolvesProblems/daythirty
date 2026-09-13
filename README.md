@@ -241,6 +241,17 @@ Three tools and a gate (`src/daythirty/agent.py`):
 The model writes the appeal. That is deliberate: the letter is the artifact the numbers
 below are measured on, so the model has to be what produces it.
 
+What the Strands SDK does in the judged path, so the credit is exact: one `Agent` on
+`BedrockModel` (temperature 0.1, chosen after measuring drift at 0.3, where the agent
+sometimes offered to file "later" instead of calling the tool); three `@tool` functions,
+one of them `@tool(context=True)` so it can raise `tool_context.interrupt`; the gate as
+`result.interrupts` plus an `interruptResponse` resume, from the page or the terminal;
+`BeforeToolCallEvent` and `AfterToolCallEvent` hooks that stream every stage and tool
+result to the page and, in `eval/grounding.py`, capture what the tools returned so the
+letter is checked against the record; a `callback_handler` that streams the draft; and
+the ablation, which runs the identical `Agent` with a tool removed from `tools`. Deployed
+twice: on Bedrock AgentCore Runtime (`agentcore_app.py`) and on App Runner (`app.py`).
+
 ### Measured
 
 Across real held-out denials, live on Bedrock:

@@ -53,7 +53,16 @@ Day Thirty works a California health insurance denial end to end, in the backgro
 
 ## How I built it
 
-Strands Agents SDK with three tools and a human interrupt, on Amazon Bedrock. Two models doing different jobs: Nova Lite reads unstructured correspondence, Haiku 4.5 writes the letter. Two deterministic engines the models are not allowed near: the statute clock and the taxonomy lookup. The gate is `tool_context.interrupt`: the run returns with the letter in `result.interrupts`, a person decides, and the run resumes with their answer.
+Strands Agents SDK, used as the spine of the product rather than as a wrapper around one model call. What is in the judged path:
+
+- One `Agent` on `BedrockModel` (Claude Haiku 4.5, temperature 0.1 after measuring behavioural drift at 0.3: at the higher setting the agent sometimes drafted the letter and offered to file "later" instead of calling the tool, which loses the gate entirely).
+- Three `@tool` functions: `compute_filing_deadline` and `find_precedent` are deterministic and the model must argue only from what they return; `file_appeal` is `@tool(context=True)` and calls `tool_context.interrupt` with the exact letter.
+- The gate is a real Strands interrupt: the run returns with `result.interrupts` populated, a person decides on the page, and the run resumes with an `interruptResponse`. The same resume works from the terminal (`run_agent.py`).
+- `BeforeToolCallEvent` and `AfterToolCallEvent` hooks drive the page live: every stage and every tool result streams to the letter as it happens, and the `callback_handler` streams the draft token by token. The grounding eval uses the same `AfterToolCallEvent` hook to capture exactly what the tools returned, so the letter is checked against the record, not against a guess.
+- The ablation runs the identical `Agent` with a tool removed from its `tools` list, so what each tool contributes is measured on the same agent, not on a rewrite.
+- Amazon Nova Lite reads the denial letter through Bedrock before the agent starts; California's taxonomy is then resolved by lookup, not by the model.
+
+Two deterministic engines the models are not allowed near: the statute clock and the taxonomy lookup.
 
 The corpus is public data from California's Department of Managed Health Care: 42,749 published determinations from 2001 to 2026, fetched by script. Splits are temporal and leak-controlled. Precedent comes only from 2016 to 2024; the 3,276 held-out cases are 2025 to 2026, with the reviewer's narrative stripped because it states the verdict.
 
