@@ -1,4 +1,4 @@
-# Agents for Humans: Day Thirty, a Strands agent that appeals health insurance denials
+# Agents for Humans: Day Thirty fights denials
 
 Last year insurers denied about 85 million in-network claims on HealthCare.gov. Consumers appealed 262,982 of them. That is under one percent, and of those appeals, insurers upheld 66%.
 
