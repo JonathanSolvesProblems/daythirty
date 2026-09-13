@@ -66,6 +66,22 @@ def main() -> int:
     must_contain(f"**{pct(cov['no_exemplar'], n)}**", "share with no exemplar")
     must_contain(f"**{cov['rate_min']:.1%} to {cov['rate_max']:.1%}**", "range of published rates")
 
+    # --- precedent relevance -------------------------------------------------------------
+    pr = load("precedent_relevance_report.json")
+    ms = pr["mean_similarity"]
+    for key, why in [("matched", "similarity of retrieved exemplars"),
+                     ("category", "same-category control"), ("random", "random control")]:
+        must_contain(f"**{ms[key]:.3f}**", why)
+    must_contain(f"**{pr['scored']:,}**", "held-out denials scored for relevance")
+    must_contain(f"**{pr['matched_beats_category_pct']}%**", "matched beats same-category random")
+    must_contain(f"**{pr['matched_beats_random_pct']}%**", "matched beats random")
+    must_contain(f"**{pr['no_better_than_category_pct']}%**", "no better than same-category random")
+    tiers = pr["mean_lift_over_category_by_tier"]
+    tight = tiers["DiagnosisSubCategory+TreatmentSubCategory+Type"]
+    coarse = tiers["DiagnosisCategory+TreatmentCategory+Type"]
+    must_contain(f"**{tight['n']:,}** cases, +{tight['lift']:.4f}", "tightest-tier lift")
+    must_contain(f"**{coarse['n']:,}** cases, +{coarse['lift']:.4f}", "coarsest-tier lift")
+
     # --- intake --------------------------------------------------------------------------
     it = load("intake_report.json")
     for key, why in [
@@ -110,10 +126,12 @@ def main() -> int:
     # Any bold percentage in the README must be derivable from a report. This is the
     # direction the check most often catches: a figure typed from memory.
     backed = set()
-    for report in (sp, cov, it, g, ab):
+    for report in (sp, cov, it, g, ab, pr):
         text = json.dumps(report)
         backed.update(re.findall(r"\d+(?:\.\d+)?", text))
         backed.update(f"{int(x):,}" for x in re.findall(r"\b\d{4,}\b", text))
+    # The relevance table rounds the report's four decimals to three.
+    backed.update(f"{v:.3f}" for v in pr["mean_similarity"].values())
     # Percentages the reports imply but do not store literally.
     backed.update({
         pct(cov["with_rate"], n)[:-1], pct(cov["with_exemplar"], n)[:-1],

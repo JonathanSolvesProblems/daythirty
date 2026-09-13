@@ -71,6 +71,8 @@ Grounding, checked mechanically against what the tools returned and with a negat
 
 Retrieval coverage across all 3,276 held-out denials: 91.5% get a published overturn rate for their situation, 84.1% get a usable exemplar to argue from, 72.4% at the tightest match. The published rate ranges from 5.0% to 98.6%, which is why the agent reports it rather than predicting an outcome: outcome prediction was measured on day one at +0.005 over a constant and dropped.
 
+Whether those exemplars are about the case, and not only superficially similar, is graded by the reviewer: for each held-out denial, the retrieved exemplars' reasoning is compared with the state physician's own findings for that case, which the agent never sees, against random cases and same-category random cases from the same pool. Retrieved exemplars score 0.245 mean similarity to the reviewer's reasoning against 0.093 for a same-category random draw and 0.035 for random, and beat the same-category draw in 87.8% of 2,754 cases. In the other 12.2% taxonomy matching did no better than category-random, almost all of it at the coarsest tier the floor allows, which is where semantic retrieval would go next.
+
 ## The ablation
 
 Same model, same six real denials, one tool switched off at a time.

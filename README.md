@@ -159,6 +159,33 @@ a hepatitis antiviral denial, because at the coarsest tier every pharmacy case m
 equally. The remaining **15.9%** get an honest "no close enough published decision"
 instead of a misleading one.
 
+### Are the exemplars about this case, or only superficially similar?
+
+Coverage says an exemplar exists. This measures whether it resembles the case, graded by
+something the agent never sees: the state reviewer's own findings for each held-out
+denial, read from the raw corpus (`eval/precedent_relevance.py`, report in
+`eval/precedent_relevance_report.json`). Each retrieved exemplar's reasoning is compared
+with that reviewer's reasoning by TF-IDF cosine over the precedent pool, verdict
+boilerplate cut from both sides, against two controls drawn from the same pool with the
+same k: random overturned cases, and random overturned cases from the same diagnosis
+category, which is what a superficially similar match looks like in this corpus.
+
+| | Mean similarity to this case's reviewer |
+|---|---|
+| Exemplars the agent retrieves | **0.245** |
+| Same diagnosis category, random | **0.093** |
+| Random | **0.035** |
+
+Across the **2,754** held-out denials that get exemplars, the retrieved set beats a
+same-category random draw in **87.8%** of cases and a random draw in **96.3%**. The flip
+side is the number a sceptic should ask for: in **12.2%** of cases taxonomy matching did
+no better than a same-category random draw. The lift is concentrated where the match is
+tight (exact diagnosis, treatment and grounds: **2,372** cases, +0.1662 over the
+same-category control) and thin at the coarsest tier the floor allows (diagnosis
+category, treatment category and grounds: **132** cases, +0.0392). That coarse tier is
+the superficially similar region, and it is where semantic retrieval over the narratives
+would go next.
+
 ## Reading the letter
 
 Real people do not have database fields. They have a letter from their plan. Amazon Nova
@@ -322,8 +349,9 @@ Requires AWS credentials with Bedrock access in `us-east-1`.
   2,926 characters in 2023 to 1,828 in 2025, so precedent is drawn from slightly
   differently written decisions than the held-out cases.
 - **`find_precedent` is taxonomy-matched, not semantic.** That is why 15.9% of denials get
-  no exemplar. Embedding retrieval would reach cases the state's categories separate but
-  medicine does not. This was attempted with `amazon.nova-2-multimodal-embeddings-v1:0`
+  no exemplar, and why in 12.2% of the rest the exemplars are no closer to the
+  reviewer's reasoning than a same-category random draw (measured above). Embedding
+  retrieval would reach cases the state's categories separate but medicine does not. This was attempted with `amazon.nova-2-multimodal-embeddings-v1:0`
   (`scripts/build_embeddings.py`, which works and is kept) and abandoned on cost: at 16
   concurrent workers this account lost 46% of calls to throttling, and the sustainable
   rate put the 12,570-record exemplar pool at several hours. The script is left in place

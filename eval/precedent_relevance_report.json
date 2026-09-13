@@ -1,0 +1,38 @@
+{
+  "grader": "the state physician reviewer's own findings for each held-out case, never shown to the agent; TF-IDF cosine over train narratives",
+  "held_out_with_narrative": 3275,
+  "scored": 2754,
+  "skipped_no_exemplar": 521,
+  "k": 3,
+  "min_exemplar_score": 40,
+  "pool_size": 12500,
+  "mean_similarity": {
+    "matched": 0.245,
+    "category": 0.0927,
+    "random": 0.0351
+  },
+  "matched_beats_category_pct": 87.8,
+  "matched_beats_random_pct": 96.3,
+  "no_better_than_category_pct": 12.2,
+  "lift_over_category": 0.1523,
+  "lift_over_random": 0.2099,
+  "mean_lift_over_category_by_tier": {
+    "DiagnosisCategory+TreatmentCategory+Type": {
+      "n": 132,
+      "lift": 0.0392
+    },
+    "DiagnosisCategory+TreatmentSubCategory+Type": {
+      "n": 238,
+      "lift": 0.0811
+    },
+    "DiagnosisSubCategory+TreatmentSubCategory": {
+      "n": 12,
+      "lift": 0.0614
+    },
+    "DiagnosisSubCategory+TreatmentSubCategory+Type": {
+      "n": 2372,
+      "lift": 0.1662
+    }
+  },
+  "seed": 20260913
+}

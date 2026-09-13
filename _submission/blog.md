@@ -42,6 +42,10 @@ Every entry at a sponsored hackathon says its tools were essential. I measured i
 
 **Without the statute engine**, told the rule in words, the model counted six months from the plan's answer and landed 86 days late in 5 of 6 cases. That is the appeal forfeited. Exactly the mistake the project exists to prevent.
 
+## Are the exemplars about the case?
+
+Retrieval is graded by the reviewer, not by me: for each held-out denial, the retrieved exemplars' reasoning is compared with the state physician's own findings for that case, which the agent never sees, against random cases and same-category random cases from the same pool. Retrieved exemplars score 0.245 mean similarity to the reviewer's reasoning against 0.093 for a same-category random draw and 0.035 for random, and beat the same-category draw in 87.8% of 2,754 cases. In the other 12.2% taxonomy matching did no better than category-random, almost all of it at the coarsest tier the floor allows, which is where semantic retrieval would go next.
+
 ## The check that fails the build
 
 `eval/check_claims.py` reads every measurement report on disk and fails if the README quotes a number the data does not support. It runs under `pytest`. On its first run it found seven disagreements, two of them real: a combined figure the report file did not store, and a corpus count no script had written down. Prose drifts; data does not.
