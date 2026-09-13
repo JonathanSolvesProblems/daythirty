@@ -121,6 +121,22 @@ button{font:inherit;cursor:pointer}
 .foot a{color:inherit}
 .err{padding:0 28px 16px;color:var(--mark-desk);font-family:var(--hand)}
 
+/* --- the note on the desk, public deployment only -------------------------------- */
+/* Same material as the sheets: paper, a hand-written label, ink. Not a modal, a note
+   left on top of the letter. It says what this page is and where the real thing is. */
+.notice{margin:0 28px 22px;background:var(--paper);color:#1C1F24;padding:22px 26px 20px;position:relative;
+        box-shadow:0 1px 2px rgba(0,0,0,.08),0 10px 28px rgba(0,0,0,.07);max-width:980px}
+.notice[hidden]{display:none}
+.notice .label{position:absolute;top:10px;right:16px;font:400 13px var(--hand);color:var(--muted)}
+.notice h2{margin:0 0 8px;font:700 22px/1.2 var(--hand);color:var(--mark)}
+.notice p{margin:0 0 10px;font:15px/1.5 var(--ui)}
+.notice p:last-of-type{margin-bottom:14px}
+.notice code{font:13.5px/1.4 Consolas,monospace;background:rgba(0,0,0,.05);padding:1px 5px;border-radius:2px}
+.notice a{color:var(--mark)}
+.notice .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.notice .btn{border-color:var(--ink);color:var(--ink)}
+.notice .btn.primary{color:#fff}
+
 @media (max-width:900px){ .desk{grid-template-columns:1fr} .margin{min-height:0} }
 </style>
 </head>
@@ -140,6 +156,22 @@ button{font:inherit;cursor:pointer}
 </div>
 <div class="stage" id="stage"></div>
 <div class="err" id="err"></div>
+
+<div class="notice" id="notice" hidden>
+  <div class="label">read this first</div>
+  <h2>This page is a public preview, not the recommended way to judge it.</h2>
+  <p>It runs the same Strands agent as the video, on AWS App Runner, and it is capped at
+     <span class="num" id="capDay">150</span> runs a day because every run is a real Amazon Bedrock call.
+     If the cap is reached, the page will say so.</p>
+  <p>The agent is also deployed on <b>Amazon Bedrock AgentCore Runtime</b>. The honest way to evaluate it is
+     the README's testing steps: clone the repo, run <code>pytest</code>, run the page locally against your own
+     credentials, and invoke the AgentCore runtime with <code>scripts/invoke_agentcore.py</code>.
+     Every case on this page is a real published denial from California's Independent Medical Review record.</p>
+  <div class="actions">
+    <button class="btn primary" id="noticeOk">Understood, show me the letter</button>
+    <a class="btn" id="noticeRepo" href="https://github.com/JonathanSolvesProblems/daythirty#running-it" target="_blank" rel="noopener">Testing steps in the README</a>
+  </div>
+</div>
 
 <div class="desk">
   <div>
@@ -412,6 +444,19 @@ async function decide(approved){
 }
 $('#sign').onclick = () => decide(true);
 $('#decline').onclick = () => decide(false);
+
+/* The note on the desk, only where the server says this is the public preview. */
+(async () => {
+  try {
+    const cfg = await (await fetch('/api/config')).json();
+    if(!cfg.public) return;
+    if(cfg.daily_cap) $('#capDay').textContent = cfg.daily_cap;
+    let seen = false;
+    try { seen = sessionStorage.getItem('daythirty-notice') === '1'; } catch(e) {}
+    if(!seen) $('#notice').hidden = false;
+    $('#noticeOk').onclick = () => { $('#notice').hidden = true; try { sessionStorage.setItem('daythirty-notice', '1'); } catch(e) {} };
+  } catch(e) {}
+})();
 
 loadCase(0);
 </script>

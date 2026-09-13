@@ -121,6 +121,22 @@ def home():
     return FileResponse(WEB / "index.html")
 
 
+@app.get("/api/config")
+def config():
+    """What the page needs to know about where it is running.
+
+    On the public deployment the page opens with a note saying so: this is a preview
+    with a daily cap, the same agent is deployed on Bedrock AgentCore, and the way to
+    judge it properly is the README's testing steps. Locally nothing is shown.
+    """
+    return {
+        "public": bool(os.environ.get("DAYTHIRTY_PUBLIC")),
+        "daily_cap": DAILY_CAP,
+        "per_ip_hourly": PER_IP_HOURLY,
+        "repo": "https://github.com/JonathanSolvesProblems/daythirty",
+    }
+
+
 @app.get("/api/case")
 def get_case(i: int = 0):
     """A real held-out case rendered as the letter the plan would have sent."""

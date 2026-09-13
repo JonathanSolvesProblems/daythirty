@@ -10,9 +10,13 @@ started.
 
 Built with the Strands Agents SDK for the AWS Agents for Humans Hackathon.
 
-**Live demo:** https://pstuqwpzp8.us-east-1.awsapprunner.com/ (public, capped at 150 runs a day; each run is a real Bedrock call)
 **Demo video (2 min):** https://www.youtube.com/watch?v=cKe6B5hYq5s
+**Public preview:** https://pstuqwpzp8.us-east-1.awsapprunner.com/ (the same agent on AWS App Runner, capped at 150 runs a day because each run is a real Bedrock call; the page says so when you arrive)
 **Write-up:** https://jonathanandrei.com/blog/day-thirty-california-insurance-appeal-agent/
+
+The preview is for a quick look. To evaluate the project properly, follow [Running it](#running-it):
+clone, `pytest`, run the page locally against your own credentials, and invoke the deployed
+[Bedrock AgentCore runtime](#deployed-on-bedrock-agentcore) with `scripts/invoke_agentcore.py`.
 
 > Not legal advice. This computes dates and drafts a document. It does not tell anyone
 > what to do, and it does not practise law.
@@ -347,8 +351,9 @@ Requires AWS credentials with Bedrock access in `us-east-1`.
 
 ## Honest limitations
 
-- **California only.** The statute engine encodes the Knox-Keene Act. Other states have
-  different clocks.
+- **California only, by data, not by design.** The statute engine encodes the Knox-Keene
+  Act and the corpus is DMHC's. See [Beyond California](#beyond-california) for what
+  another jurisdiction needs, which is two inputs and no change to the agent.
 - **Two holidays are unimplemented.** See the known gap above. Every result says so.
 - **The demo's dates are constructed.** The clinical facts of each case are real and
   published; the denial and grievance dates are not, because DMHC does not publish them.
@@ -372,6 +377,30 @@ Requires AWS credentials with Bedrock access in `us-east-1`.
   online form, by fax or by mail, and publishes no API. Approval therefore ends with the
   finished application and its due date in the person's hands, and the page says
   "that last step is yours" rather than stamping something it did not do.
+
+## Beyond California
+
+Nothing in the agent is Californian. The state lives in two inputs, and both are the
+kind of thing another jurisdiction publishes:
+
+1. **The clock.** `src/daythirty/deadlines.py` is one module: a qualifying-event rule, a
+   period, a calendar-arithmetic rule, and a holiday table, each line citing its
+   provision. Another state's external review clock is the same four things with
+   different citations: a sibling module, and a state argument on
+   `compute_filing_deadline` to choose between them. The tests in
+   `tests/test_deadlines.py` are the template for proving the new one against its own
+   statute.
+2. **The record.** `find_precedent` reads a table of published decisions with a category
+   taxonomy and the reviewer's reasoning. California publishes all of that as open data;
+   other states publish external review outcomes too (New York's Department of Financial
+   Services keeps a searchable external appeal database), and the federal external review
+   process under the Affordable Care Act produces the same kind of record. A new corpus
+   is a fetch script plus `eval/build_split.py` for the temporal split, and the same
+   coverage, grounding and relevance evals run unchanged against it.
+
+The intake, the drafting, the grounding checks, the gate and the web surface do not
+change. What does not transfer is the number: every rate this project quotes is a count
+over California's record, and a new jurisdiction gets its own count, graded the same way.
 
 ## Status
 
