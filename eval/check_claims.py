@@ -132,7 +132,7 @@ def main() -> int:
     # method rather than a result. Listed here so they are visible, not silently allowed.
     EXTERNAL = {
         "85", "262,982", "1", "66",            # KFF 2024, cited in the README
-        "72.3", "25",                           # DMHC trend, eval/trend.py
+        "72.3", "72.34", "25",                  # DMHC trend, eval/trend.py
         "17.9", "1.8", "29.2", "82.7",          # eval/deadline_divergence.py sweep
         "30.0", "33.3",                         # intake before the taxonomy fix
         "40", "50", "60",                       # rates the model invented in the ablation
@@ -149,8 +149,26 @@ def main() -> int:
             continue
         failures.append(f"README bolds {num!r} and no report or cited source backs it")
 
+    # --- gallery captions, when the previews exist ---------------------------------------
+    # The submission form's image captions are prose too, and they are the prose a judge
+    # reads first. Same rule: a percentage in a caption must be one the data or a cited
+    # source backs, and the form's 140-character limit is asserted rather than eyeballed.
+    captions = ROOT / "preview" / "captions.md"
+    caption_pcts: list[str] = []
+    if captions.exists():
+        text = captions.read_text(encoding="utf-8")
+        caption_pcts = re.findall(r"(\d[\d,]*(?:\.\d+)?)%", text)
+        for num in caption_pcts:
+            plain = num.replace(",", "")
+            if not (num in backed or plain in backed or num in EXTERNAL or plain in EXTERNAL):
+                failures.append(f"preview/captions.md states {num}% and no report or cited source backs it")
+        for block in re.findall(r"```\n(.*?)\n```", text, re.S):
+            if len(block) > 140:
+                failures.append(f"preview caption is {len(block)} characters, the form allows 140: {block[:48]!r}")
+
     print(f"claims checked against reports: {checked}")
     print(f"bold figures audited: {len(bold_numbers)}")
+    print(f"gallery caption percentages audited: {len(caption_pcts)}")
     if failures:
         print(f"\nFAIL: {len(failures)} disagreement(s) between README and data")
         for f in failures:
