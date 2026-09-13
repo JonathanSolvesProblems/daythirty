@@ -63,4 +63,8 @@ It does not predict whether you will win. That was the original plan and it was 
 
 Two holidays in Gov. Code § 6700 are defined astronomically (Lunar New Year, Diwali) and are supplied as data with empty tables; every result says so. California only. Not legal advice.
 
-Code: https://github.com/JonathanSolvesProblems/daythirty
+Demo video (2 min): https://www.youtube.com/watch?v=cKe6B5hYq5s
+
+Code, evaluation reports and honest limitations: https://github.com/JonathanSolvesProblems/daythirty
+
+Also deployed on Amazon Bedrock AgentCore Runtime; the README records a real invocation with its timing. Built for the AWS Agents for Humans hackathon, Everyday Agents track.
