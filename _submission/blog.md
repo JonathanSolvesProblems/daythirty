@@ -18,26 +18,15 @@ So: Day Thirty. An agent built on the Strands Agents SDK and Amazon Bedrock that
 
 ## The Strands pieces that mattered
 
-Three tools and one interrupt.
+Three tools and one interrupt, all plain `@tool` functions.
 
-```python
-@tool
-def compute_filing_deadline(denial_date, grievance_filed, plan_upheld_on="", expedited=False):
-    # deterministic, cites the statute, returns the date and the reasoning
-    ...
+`compute_filing_deadline(denial_date, grievance_filed, plan_upheld_on, expedited)` is deterministic. It cites the statute and returns the date with its reasoning.
 
-@tool
-def find_precedent(diagnosis_category, ..., grounds):
-    # retrieval over 22,090 published decisions, returns the cohort rate and exemplars
-    ...
+`find_precedent(diagnosis_category, diagnosis_subcategory, treatment_category, treatment_subcategory, grounds)` is retrieval over 22,090 published decisions. It returns the cohort overturn rate, a plain-English description of exactly which denials that rate covers, and exemplar reasoning from cases that won.
 
-@tool(context=True)
-def file_appeal(tool_context: ToolContext, letter, deadline, summary):
-    decision = tool_context.interrupt(name="approve_filing", reason={...})
-    ...
-```
+`file_appeal(tool_context, letter, deadline, summary)` is declared with `@tool(context=True)` and does one thing: it calls `tool_context.interrupt(name="approve_filing", reason={...})` with the exact letter.
 
-`tool_context.interrupt` is the whole product claim in one call. The agent returns with `result.interrupts` populated, the person reads the letter, and the run resumes with an `interruptResponse` carrying their decision. The Everyday Agents track description says the best agents "only ping you when there's a real decision to make." This is that ping.
+That interrupt is the whole product claim in one call. The agent returns with `result.interrupts` populated, the person reads the letter, and the run resumes with an `interruptResponse` carrying their decision. The Everyday Agents track description says the best agents "only ping you when there's a real decision to make." This is that ping.
 
 ## Where I drew the line between model and code
 
@@ -69,18 +58,13 @@ The same agent is deployed on Amazon Bedrock AgentCore Runtime, built as an ARM6
 
 ## Try it
 
-```
-git clone https://github.com/JonathanSolvesProblems/daythirty
-cd daythirty
-python -m venv .venv && .venv/Scripts/pip install -r requirements.txt
-pytest                              # 20 tests, no AWS needed
-python scripts/fetch_corpus.py      # 85 MB from California's open data portal
-python eval/build_split.py
-python scripts/build_taxonomy.py
-.venv/Scripts/uvicorn app:app --port 8030
-```
+1. `git clone https://github.com/JonathanSolvesProblems/daythirty` and `cd daythirty`
+2. `python -m venv .venv` then `.venv/Scripts/pip install -r requirements.txt`
+3. `pytest` runs 20 tests with no AWS needed
+4. `python scripts/fetch_corpus.py` pulls 85 MB from California's open data portal, then `python eval/build_split.py` and `python scripts/build_taxonomy.py`
+5. `.venv/Scripts/uvicorn app:app --port 8030` and open the page it serves on port 8030
 
-Open http://127.0.0.1:8030, click "Work this denial", and sign it or don't. It needs AWS credentials with Bedrock access in us-east-1 (Claude Haiku 4.5 and Amazon Nova Lite through the us.* inference profiles). A run takes 15 to 35 seconds and costs about a cent.
+Click "Work this denial", and sign it or don't. It needs AWS credentials with Bedrock access in us-east-1 (Claude Haiku 4.5 and Amazon Nova Lite through the us inference profiles). A run takes 15 to 35 seconds and costs about a cent.
 
 Demo video (2 min): https://www.youtube.com/watch?v=cKe6B5hYq5s
 
