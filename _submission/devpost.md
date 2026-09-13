@@ -53,9 +53,11 @@ Day Thirty works a California health insurance denial end to end, in the backgro
 
 ## How I built it
 
-Strands Agents SDK with three tools and a human interrupt, on Amazon Bedrock. Two models doing different jobs: Nova Lite reads unstructured correspondence, Haiku 4.5 writes the letter. Two deterministic engines the models are not allowed near: the statute clock and the taxonomy lookup.
+Strands Agents SDK with three tools and a human interrupt, on Amazon Bedrock. Two models doing different jobs: Nova Lite reads unstructured correspondence, Haiku 4.5 writes the letter. Two deterministic engines the models are not allowed near: the statute clock and the taxonomy lookup. The gate is `tool_context.interrupt`: the run returns with the letter in `result.interrupts`, a person decides, and the run resumes with their answer.
 
 The corpus is public data from California's Department of Managed Health Care: 42,749 published determinations from 2001 to 2026, fetched by script. Splits are temporal and leak-controlled. Precedent comes only from 2016 to 2024; the 3,276 held-out cases are 2025 to 2026, with the reviewer's narrative stripped because it states the verdict.
+
+The same agent is deployed on Amazon Bedrock AgentCore Runtime (ARM64 container built by CodeBuild), so it works in the background rather than on a laptop. Invoked with a real published denial it returns in about 14 seconds with the intake, the statutory deadline and the drafted appeal stopped at the gate. The web surface is a single page: the insurer's typeset letter, marked up by hand in a litigator's ink, with a signature line for the gate, because you sign an appeal to file it.
 
 ## What I measured, and who graded it
 
@@ -77,7 +79,7 @@ Without California's record, the model invented overturn rates of 40%, 50% and 6
 
 Without the statute engine, on the timeline where the plan sat on the grievance for 120 days, the model counted six months from the plan's answer and landed 86 days late in 5 of 6 cases. That is the appeal forfeited. It was told the rule in words and still did not apply it.
 
-## Challenges
+## Challenges I ran into
 
 Outcome prediction was the original headline and it was dead: the held-out overturn base rate is 71.89% and precedent lookup scores 0.7234, a lift of +0.005. The product had to be a reporter, not a predictor.
 
@@ -87,11 +89,25 @@ Asking Nova for California's category directly scored 30%. Reading the misses sh
 
 A Nova embeddings index for the 15.9% of denials with no close taxonomy match was built and abandoned on throttling. The script stays; the README says the index is not built.
 
-## Accomplishments
+## Accomplishments that I'm proud of
 
-eval/check_claims.py reads every measurement report and fails the build if the README quotes a number the data does not support. On its first run it found seven disagreements, two of them real. It runs under pytest.
+eval/check_claims.py reads every measurement report and fails the build if the README quotes a number the data does not support. On its first run it found seven disagreements, two of them real. It runs under pytest, and it now audits the gallery captions on this page too.
 
-## What's next
+The ablation above. Every entry at a sponsored hackathon says its tools were essential; I switched them off one at a time and measured what each one contributed.
+
+The page used to stamp FILED after approval when nothing had been submitted, because DMHC has no API. I caught it before recording the demo and fixed the product rather than the wording: approval now hands over the finished application, the due date and the real channels, and the page says "that last step is yours". The tagline says "ready to sign" instead of "filed" for the same reason.
+
+## What I learned
+
+A model told the rule in words still gets the date wrong. Given "the clock starts thirty days after the grievance, whether or not the plan answers", Haiku counted from the plan's answer in 5 of 6 late-answer cases. Anything where a wrong answer cannot be recovered from belongs in code that cites its provision, and the model should be handed the result.
+
+The boundary between model and lookup is an empirical question, not a design taste. Nova reads a letter well and classifies it badly, because California's categories encode patient context that a letter does not contain. Moving that one step from the model to the state's own filings doubled the score.
+
+A sentence must never be more real than the artifact behind it. "Filed" was one word, and it would have put a claim on the judged surface that the code did not back.
+
+Reporting beats predicting when the honest lift over a constant is +0.005. The published rate for a matched cohort runs from 5.0% to 98.6%, and telling someone that number, with its exact scope, is worth more than a guess dressed as a forecast.
+
+## What's next for Day Thirty
 
 The astronomical holidays in Gov. Code § 6700 (Lunar New Year, Diwali) are supplied as data and the tables are empty; every result says so. Semantic retrieval for the taxonomy gap. Other states' clocks. And the last step: DMHC publishes no API for IMR applications, so today approval hands the person the finished package and the channels, and they send it. If DMHC ever exposes one, that is where the gate's "yes" would go.
 ```
