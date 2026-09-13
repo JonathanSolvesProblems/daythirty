@@ -300,6 +300,14 @@ $('#run').onclick = async () => {
 
   const r = await fetch('/api/run', {method:'POST', headers:{'content-type':'application/json'},
     body: JSON.stringify({letter: ta.value, grievance_filed: current.grievance_filed, age: current.age, gender: current.gender})});
+  if(!r.ok){
+    // The public deployment caps runs per day and per address. Say why, plainly.
+    let msg = `The run could not start (${r.status}).`;
+    try { msg = (await r.json()).detail || msg; } catch(e) {}
+    $('#err').textContent = msg; $('#stage').textContent = '';
+    letterEl.hidden = true; ta.hidden = false; $('#run').disabled = false;
+    return;
+  }
   runId = (await r.json()).run_id;
 
   es = new EventSource(`/api/run/${runId}/events`);

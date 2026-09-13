@@ -10,6 +10,7 @@ started.
 
 Built with the Strands Agents SDK for the AWS Agents for Humans Hackathon.
 
+**Live demo:** https://pstuqwpzp8.us-east-1.awsapprunner.com/ (public, capped at 150 runs a day; each run is a real Bedrock call)
 **Demo video (2 min):** https://www.youtube.com/watch?v=cKe6B5hYq5s
 **Write-up:** https://jonathanandrei.com/blog/day-thirty-california-insurance-appeal-agent/
 
@@ -314,9 +315,15 @@ runtime returned in **14.2 seconds** round trip with the intake, the statutory d
 stopped at the gate. The response says, in words, that nothing has been filed and that
 filing requires a person. The runtime never files.
 
+The web surface is also deployed publicly on **AWS App Runner** (https://pstuqwpzp8.us-east-1.awsapprunner.com/), from
+`Dockerfile.web`, with Bedrock reached through an instance role so no credential exists in
+the image. It is capped at 150 runs a day and 12 an hour per address (`DAYTHIRTY_DAILY_CAP`,
+`DAYTHIRTY_PER_IP_HOURLY` in `app.py`), because every run is a real Bedrock call; when
+the cap is hit the page says so. It comes down on 2026-10-14 with everything else.
+
 AWS surface in the judged path: Strands Agents SDK, Bedrock (Amazon Nova Lite for
-intake, Claude Haiku 4.5 for drafting), AgentCore Runtime, ECR, CodeBuild, S3,
-CloudWatch. Every resource is listed in `TEARDOWN.md` with the date it comes down.
+intake, Claude Haiku 4.5 for drafting), AgentCore Runtime, App Runner, ECR, CodeBuild,
+S3, CloudWatch. Every resource is listed in `TEARDOWN.md` with the date it comes down.
 
 ## Running it
 

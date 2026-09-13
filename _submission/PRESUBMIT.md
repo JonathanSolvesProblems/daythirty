@@ -25,7 +25,7 @@ Deadline: 2026-09-14, 5:00pm PDT.
 | Architecture diagram | `_submission/architecture.png`, and the mermaid source in `README.md` |
 | Demo video, 5 minutes max, working project end to end | **PUBLISHED 2026-09-13**: https://www.youtube.com/watch?v=cKe6B5hYq5s (1:59, public, oEmbed confirms it resolves logged out). Source `broll/demo.mp4`, 1920x1080, 48 kHz, -16.7 LUFS. Every spoken number carries a `Source:` lower third (KFF 2024, Cal. HSC 1374.30, DMHC dataset), verified against the fetched page and listed in `broll/_sources.json`. |
 | AWS Builder ID | `jon.knight.andrei@gmail.com`, confirmed on the Builder ID profile page |
-| Optional: live demo link | Not public. The web UI runs locally; the AgentCore runtime requires IAM to invoke. |
+| Optional: live demo link | **LIVE 2026-09-13**: https://pstuqwpzp8.us-east-1.awsapprunner.com/ on AWS App Runner, driven end to end from a logged-out browser (letter, run, gate in 10.6 s, signature, APPROVED). Capped 150 runs/day, 12/hour/address. |
 | Optional: builder.aws publication (up to +0.6) | **PUBLISHED 2026-09-13**: https://builder.aws.com/content/3JH7lS51B5uDycfrlm3AzPrzYTO/agents-for-humans-day-thirty-a-strands-agent-that-fights-a-health-insurance-denial-and-stops-for-your-ok (read logged out: full body, all sections and both links present). Source `_submission/blog.md`. |
 | Strands Agents explicitly named in the submission | Yes, in the pitch, the description and "Built with" |
 

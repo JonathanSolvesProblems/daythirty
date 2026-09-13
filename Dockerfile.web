@@ -1,0 +1,23 @@
+# The public demo: the same web surface as `uvicorn app:app`, in a container for AWS
+# App Runner. Bedrock is reached through the instance role, so no credential is in the
+# image. The precedent corpus (data/split) is baked in because the page needs it on
+# first request and it is public data.
+#
+#   docker build -f Dockerfile.web -t daythirty-web .
+#   docker run -p 8080:8080 -e AWS_REGION=us-east-1 daythirty-web
+
+FROM python:3.12-slim
+
+WORKDIR /app
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 AWS_REGION=us-east-1
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY src ./src
+COPY web ./web
+COPY app.py .
+COPY data/split/train.jsonl data/split/test.jsonl ./data/split/
+
+EXPOSE 8080
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]

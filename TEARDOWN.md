@@ -34,6 +34,18 @@ one afterwards from the console or CLI rather than trusting the tool's summary:
   Delete it, then confirm with
   `aws bedrock-agentcore-control list-memories --region us-east-1`.
 
+App Runner public demo, created 2026-09-13 (`us-east-1`), bills for the provisioned
+instance every hour it exists, so it is the first thing to delete:
+
+- App Runner service `daythirty`
+  `arn:aws:apprunner:us-east-1:533354334997:service/daythirty/02ec0a53fc4743ec81e8ec8345043239`
+  (https://pstuqwpzp8.us-east-1.awsapprunner.com/). `aws apprunner delete-service --service-arn <arn>`, then confirm with
+  `aws apprunner list-services --region us-east-1` and that the URL no longer answers.
+- ECR repository `daythirty-web` (delete with `--force`)
+- IAM roles `DayThirtyAppRunnerECRAccess` and `DayThirtyAppRunnerInstance`
+- Policy `AWSAppRunnerFullAccess` attached to `unsay-bedrock`, to detach
+- CloudWatch log groups under `/aws/apprunner/daythirty/`
+
 Then sweep every region for orphans, and delete the user's single access key (created
 2026-08-11; `aws iam list-access-keys --user-name unsay-bedrock` shows it) if the account
 is no longer in use.

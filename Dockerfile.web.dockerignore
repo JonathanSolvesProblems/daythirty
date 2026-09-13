@@ -1,0 +1,10 @@
+# BuildKit reads <Dockerfile>.dockerignore for this Dockerfile only. The AgentCore
+# image keeps its own .dockerignore. Everything the web image needs is COPYed by name.
+*
+!requirements.txt
+!src/
+!web/
+!app.py
+!data/split/train.jsonl
+!data/split/test.jsonl
+**/__pycache__/

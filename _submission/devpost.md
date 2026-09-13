@@ -57,7 +57,7 @@ Strands Agents SDK with three tools and a human interrupt, on Amazon Bedrock. Tw
 
 The corpus is public data from California's Department of Managed Health Care: 42,749 published determinations from 2001 to 2026, fetched by script. Splits are temporal and leak-controlled. Precedent comes only from 2016 to 2024; the 3,276 held-out cases are 2025 to 2026, with the reviewer's narrative stripped because it states the verdict.
 
-The same agent is deployed on Amazon Bedrock AgentCore Runtime (ARM64 container built by CodeBuild), so it works in the background rather than on a laptop. Invoked with a real published denial it returns in about 14 seconds with the intake, the statutory deadline and the drafted appeal stopped at the gate. The web surface is a single page: the insurer's typeset letter, marked up by hand in a litigator's ink, with a signature line for the gate, because you sign an appeal to file it.
+The same agent is deployed on Amazon Bedrock AgentCore Runtime (ARM64 container built by CodeBuild), so it works in the background rather than on a laptop. Invoked with a real published denial it returns in about 14 seconds with the intake, the statutory deadline and the drafted appeal stopped at the gate. The web surface is also live on AWS App Runner (the demo link on this page), reaching Bedrock through an instance role and capped per day because every run is a real call. It is a single page: the insurer's typeset letter, marked up by hand in a litigator's ink, with a signature line for the gate, because you sign an appeal to file it.
 
 ## What I measured, and who graded it
 
@@ -134,7 +134,9 @@ jon.knight.andrei@gmail.com
 
 ## URL to your live demo link (optional)
 
-Left blank. The web surface runs locally against the judge's own AWS credentials, and the AgentCore runtime needs IAM in my account. See the notes below if a public deployment is stood up before the deadline.
+```
+https://pstuqwpzp8.us-east-1.awsapprunner.com/
+```
 
 ## Testing instructions
 
@@ -151,7 +153,9 @@ python eval/build_split.py              temporal, leak-controlled split
 python scripts/build_taxonomy.py        the state's own category filings
 .venv/Scripts/uvicorn app:app --port 8030
 
-Open http://127.0.0.1:8030. A real published denial is loaded; the arrows pick another. Click "Work this denial" and watch the letter get marked up: the intake, the statutory deadline with its provisions, the published overturn rate for this kind of denial and what persuaded the reviewers, then the drafted appeal. The run stops at the signature line. "Sign it" stamps APPROVED, writes the application package to outbox/ and shows the due date and DMHC's filing channels. "Don't sign" and nothing leaves. A run takes 15 to 35 seconds and costs about a cent in Bedrock usage.
+Or skip the setup: the same page is live at https://pstuqwpzp8.us-east-1.awsapprunner.com/ (capped at 150 runs a day).
+
+Open http://127.0.0.1:8030 (or the live URL). A real published denial is loaded; the arrows pick another. Click "Work this denial" and watch the letter get marked up: the intake, the statutory deadline with its provisions, the published overturn rate for this kind of denial and what persuaded the reviewers, then the drafted appeal. The run stops at the signature line. "Sign it" stamps APPROVED, writes the application package to outbox/ and shows the due date and DMHC's filing channels. "Don't sign" and nothing leaves. A run takes 15 to 35 seconds and costs about a cent in Bedrock usage.
 
 The same run in a terminal: python run_agent.py (asks for approval) or python run_agent.py --approve.
 

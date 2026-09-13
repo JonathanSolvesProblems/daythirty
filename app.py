@@ -10,6 +10,7 @@ look up the precedent, draft, then stop at the gate.
 from __future__ import annotations
 
 import json
+import os
 import queue
 import sys
 import threading
@@ -18,7 +19,7 @@ import uuid
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 
@@ -41,6 +42,42 @@ OUTBOX = ROOT / "outbox"
 _index: PrecedentIndex | None = None
 _cases: list[dict] | None = None
 RUNS: dict[str, dict] = {}
+
+# Spend guard for the public deployment. Each run is a Bedrock call that costs about a
+# cent, and a public page can be hammered, so the deployment sets a daily cap and a
+# per-address hourly cap through the environment. Both default to off, so a local run
+# behaves exactly as before. Counts live in memory: a restart resets them, which is fine
+# for a cap whose job is to bound a bad day, not to meter.
+DAILY_CAP = int(os.environ.get("DAYTHIRTY_DAILY_CAP", "0"))
+PER_IP_HOURLY = int(os.environ.get("DAYTHIRTY_PER_IP_HOURLY", "0"))
+_day: list = [date.today(), 0]
+_by_ip: dict[str, list[float]] = {}
+
+
+def _client_ip(request: Request) -> str:
+    fwd = request.headers.get("x-forwarded-for", "")
+    if fwd:
+        return fwd.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
+def _guard(request: Request) -> None:
+    now = time.time()
+    if DAILY_CAP:
+        if _day[0] != date.today():
+            _day[0], _day[1] = date.today(), 0
+        if _day[1] >= DAILY_CAP:
+            raise HTTPException(429, "This public demo has used its runs for today. The "
+                                     "video shows the full run, and the repo runs it locally.")
+        _day[1] += 1
+    if PER_IP_HOURLY:
+        ip = _client_ip(request)
+        recent = [t for t in _by_ip.get(ip, []) if now - t < 3600]
+        if len(recent) >= PER_IP_HOURLY:
+            raise HTTPException(429, f"That is {PER_IP_HOURLY} runs in an hour from this "
+                                     "address. Try again later, or run it from the repo.")
+        recent.append(now)
+        _by_ip[ip] = recent
 
 
 def index() -> PrecedentIndex:
@@ -235,7 +272,8 @@ my appeal."""
 
 
 @app.post("/api/run")
-def start_run(req: RunRequest):
+def start_run(req: RunRequest, request: Request):
+    _guard(request)
     run_id = uuid.uuid4().hex[:12]
     RUNS[run_id] = {"q": queue.Queue(), "agent": None, "interrupt_id": None,
                     "finished": False, "started": time.time()}
